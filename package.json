@@ -1,0 +1,25 @@
+{
+  "name": "datamarketplace-bot",
+  "version": "2.0.0",
+  "description": "Automated auction bot for datamarketplaces.net — direct smart contract integration (Sepolia)",
+  "main": "src/index.js",
+  "type": "commonjs",
+  "scripts": {
+    "start":    "node index.js",
+    "simulate": "node index.js --mode=simulate",
+    "buy":      "node index.js --mode=buy",
+    "sell":     "node index.js --mode=sell",
+    "auto":     "node index.js --mode=auto",
+    "status":   "node index.js --mode=status",
+    "winner":   "node index.js --mode=winner",
+    "listen":   "node index.js --mode=listen",
+    "test":     "node test.js"
+  },
+  "dependencies": {
+    "web3": "^4.9.0",
+    "dotenv": "^16.4.5",
+    "winston": "^3.13.0",
+    "node-cron": "^3.0.3",
+    "chalk": "^4.1.2"
+  }
+}
