@@ -1,0 +1,14 @@
+[
+  {
+    "minimumContribution": 500,
+    "dataForSell": "https://my-secure-storage.com/dataset-abc123.csv",
+    "dataDescription": "Financial time-series dataset Q1 2024 — 500 equities, hourly OHLCV",
+    "auctionDuration": 10
+  },
+  {
+    "minimumContribution": 200,
+    "dataForSell": "API_KEY:sk-live-abc123 | endpoint: https://api.example.com/v1/data",
+    "dataDescription": "Real-time weather sensor data — 1000 IoT sensors across EU",
+    "auctionDuration": 5
+  }
+]

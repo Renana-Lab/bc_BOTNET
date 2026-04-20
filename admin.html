@@ -1,0 +1,625 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>DataMarketplace Bot — Admin Panel</title>
+<style>
+  :root {
+    --bg: #0d1117; --surface: #161b22; --surface2: #1f2937;
+    --border: #30363d; --text: #e6edf3; --muted: #8b949e;
+    --blue: #2563eb; --blue-h: #1d4ed8; --green: #16a34a;
+    --green-h: #15803d; --red: #dc2626; --red-h: #b91c1c;
+    --yellow: #d97706; --purple: #7c3aed;
+    --radius: 8px; --font: 'Segoe UI', system-ui, sans-serif;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { background: var(--bg); color: var(--text); font-family: var(--font); font-size: 14px; }
+  header { background: var(--surface); border-bottom: 1px solid var(--border); padding: 14px 24px; display: flex; align-items: center; gap: 12px; }
+  header h1 { font-size: 18px; font-weight: 700; }
+  .badge { padding: 3px 10px; border-radius: 20px; font-size: 12px; font-weight: 600; }
+  .badge.live { background: #16a34a33; color: #4ade80; }
+  .badge.sim  { background: #d9780633; color: #fbbf24; }
+  .badge.off  { background: #374151; color: #9ca3af; }
+  #statusDot { width: 10px; height: 10px; border-radius: 50%; background: var(--red); transition: background .3s; }
+  #statusDot.on { background: var(--green); box-shadow: 0 0 8px #16a34a; }
+  main { display: grid; grid-template-columns: 340px 1fr; gap: 0; height: calc(100vh - 53px); overflow: hidden; }
+  aside { background: var(--surface); border-right: 1px solid var(--border); overflow-y: auto; padding: 16px; display: flex; flex-direction: column; gap: 14px; }
+  .content { overflow-y: auto; padding: 16px; display: flex; flex-direction: column; gap: 14px; }
+  .card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 14px; }
+  .card h2 { font-size: 13px; font-weight: 600; color: var(--muted); text-transform: uppercase; letter-spacing: .05em; margin-bottom: 12px; }
+  .stat-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+  .stat { background: var(--surface2); border-radius: 6px; padding: 10px 12px; }
+  .stat .val { font-size: 20px; font-weight: 700; color: var(--text); }
+  .stat .lbl { font-size: 11px; color: var(--muted); margin-top: 2px; }
+  .btn { display: inline-flex; align-items: center; gap: 6px; padding: 8px 14px; border-radius: 6px; border: none; cursor: pointer; font-size: 13px; font-weight: 600; transition: background .15s, opacity .15s; }
+  .btn:disabled { opacity: .45; cursor: not-allowed; }
+  .btn.primary  { background: var(--blue);   color: #fff; }
+  .btn.primary:hover:not(:disabled)  { background: var(--blue-h); }
+  .btn.success  { background: var(--green);  color: #fff; }
+  .btn.success:hover:not(:disabled)  { background: var(--green-h); }
+  .btn.danger   { background: var(--red);    color: #fff; }
+  .btn.danger:hover:not(:disabled)   { background: var(--red-h); }
+  .btn.ghost    { background: var(--surface2); color: var(--text); border: 1px solid var(--border); }
+  .btn.ghost:hover:not(:disabled)    { background: var(--border); }
+  .btn-row { display: flex; gap: 8px; flex-wrap: wrap; }
+  .field { margin-bottom: 10px; }
+  .field label { display: block; font-size: 12px; color: var(--muted); margin-bottom: 4px; }
+  .field input, .field select, .field textarea {
+    width: 100%; background: var(--surface2); border: 1px solid var(--border);
+    border-radius: 6px; color: var(--text); padding: 7px 10px; font-size: 13px;
+    font-family: var(--font); outline: none;
+  }
+  .field input:focus, .field select:focus, .field textarea:focus { border-color: var(--blue); }
+  .field textarea { resize: vertical; min-height: 60px; }
+  .toggle-row { display: flex; align-items: center; justify-content: space-between; padding: 4px 0; }
+  .toggle { position: relative; width: 40px; height: 22px; }
+  .toggle input { opacity: 0; width: 0; height: 0; }
+  .slider { position: absolute; inset: 0; background: var(--border); border-radius: 22px; transition: .2s; cursor: pointer; }
+  .slider:before { content: ''; position: absolute; width: 16px; height: 16px; left: 3px; bottom: 3px; background: #fff; border-radius: 50%; transition: .2s; }
+  input:checked + .slider { background: var(--green); }
+  input:checked + .slider:before { transform: translateX(18px); }
+  table { width: 100%; border-collapse: collapse; font-size: 13px; }
+  th { text-align: left; padding: 8px 10px; color: var(--muted); font-weight: 600; font-size: 11px; text-transform: uppercase; border-bottom: 1px solid var(--border); }
+  td { padding: 8px 10px; border-bottom: 1px solid var(--border); vertical-align: middle; }
+  tr:last-child td { border-bottom: none; }
+  tr:hover td { background: var(--surface2); }
+  .pill { display: inline-block; padding: 2px 8px; border-radius: 20px; font-size: 11px; font-weight: 600; }
+  .pill.open   { background: #16a34a22; color: #4ade80; }
+  .pill.closed { background: #37415122; color: #9ca3af; }
+  .pill.winning { background: #f59e0b22; color: #fbbf24; }
+  .pill.mine   { background: #7c3aed22; color: #a78bfa; }
+  #logBox { background: #0d1117; border-radius: 6px; padding: 10px; height: 260px; overflow-y: auto; font-family: 'Consolas', monospace; font-size: 12px; line-height: 1.5; }
+  .log-info  { color: #8b949e; }
+  .log-warn  { color: #fbbf24; }
+  .log-error { color: #f87171; }
+  .wallet-addr { font-family: monospace; font-size: 12px; color: var(--muted); word-break: break-all; }
+  .toast { position: fixed; bottom: 20px; right: 20px; background: var(--surface2); border: 1px solid var(--border); border-radius: 8px; padding: 10px 16px; font-size: 13px; z-index: 999; opacity: 0; transform: translateY(10px); transition: all .2s; pointer-events: none; }
+  .toast.show { opacity: 1; transform: translateY(0); }
+  .toast.ok  { border-color: var(--green); color: #4ade80; }
+  .toast.err { border-color: var(--red);   color: #f87171; }
+  .section-tabs { display: flex; gap: 2px; border-bottom: 1px solid var(--border); margin-bottom: 14px; }
+  .tab { padding: 8px 14px; cursor: pointer; border-bottom: 2px solid transparent; color: var(--muted); font-size: 13px; font-weight: 500; }
+  .tab.active { color: var(--text); border-bottom-color: var(--blue); }
+  .tab-panel { display: none; }
+  .tab-panel.active { display: block; }
+  .countdown { font-variant-numeric: tabular-nums; }
+  hr { border: none; border-top: 1px solid var(--border); }
+</style>
+</head>
+<body>
+
+<header>
+  <div id="statusDot"></div>
+  <h1>🤖 DataMarketplace Bot</h1>
+  <span id="modeBadge" class="badge sim">SIMULATE</span>
+  <span style="margin-left:auto;font-size:12px;color:var(--muted)" id="walletShort">Loading...</span>
+</header>
+
+<main>
+<!-- ── SIDEBAR ── -->
+<aside>
+  <!-- Wallet stats -->
+  <div class="card">
+    <h2>Wallet</h2>
+    <div class="stat-grid">
+      <div class="stat"><div class="val" id="balETH">—</div><div class="lbl">Balance (ETH)</div></div>
+      <div class="stat"><div class="val" id="budgetWei">—</div><div class="lbl">Budget (wei)</div></div>
+      <div class="stat"><div class="val" id="statBids">0</div><div class="lbl">Bids placed</div></div>
+      <div class="stat"><div class="val" id="statCreated">0</div><div class="lbl">Auctions created</div></div>
+    </div>
+    <div class="wallet-addr" id="walletAddr" style="margin-top:10px">—</div>
+  </div>
+
+  <!-- Bot controls -->
+  <div class="card">
+    <h2>Bot Controls</h2>
+    <div class="btn-row" style="margin-bottom:10px">
+      <button class="btn success" id="btnStart" onclick="botStart()">▶ Start</button>
+      <button class="btn danger"  id="btnStop"  onclick="botStop()" disabled>■ Stop</button>
+      <button class="btn ghost"   onclick="runOnce()">⚡ Run once</button>
+    </div>
+    <div class="field">
+      <label>Mode</label>
+      <select id="cfgMode" onchange="setMode(this.value)">
+        <option value="simulate">Simulate (no txs)</option>
+        <option value="buy">Buy only</option>
+        <option value="sell">Sell only</option>
+        <option value="smart">Smart (aggressive)</option>
+        <option value="dumb">Dumb (random)</option>
+        <option value="auto">Auto (buy + sell)</option>
+      </select>
+    </div>
+    <div class="field">
+      <label>Cron schedule</label>
+      <input id="cfgCron" placeholder="*/2 * * * *" />
+    </div>
+    <div class="toggle-row">
+      <span style="font-size:13px">Auto-create auctions if none open</span>
+      <label class="toggle"><input type="checkbox" id="cfgAutoCreate" onchange="saveConfig()"><span class="slider"></span></label>
+    </div>
+    <div style="margin-top:10px">
+      <button class="btn" onclick="runMode('simulate')">🎭 Simulate</button>
+      <button class="btn" onclick="runMode('buy')">💸 Buy</button>
+      <button class="btn" onclick="runMode('sell')">📦 Sell</button>
+      <button class="btn success" onclick="runMode('smart')">🧠 Smart</button>
+      <button class="btn warning" onclick="runMode('dumb')">🎲 Dumb</button>
+      <button class="btn" onclick="runMode('winner')">🏆 Winner</button>
+      <button class="btn ghost" onclick="showDiagnostics()">🔧 Diagnostics</button>
+      <button class="btn ghost" onclick="debugFactory()">🐛 Debug</button>
+    </div>
+    <div style="margin-top:10px">
+      <span id="lastCycle" style="font-size:11px;color:var(--muted)">Last cycle: never</span>
+    </div>
+  </div>
+
+  <!-- Bidding strategy -->
+  <div class="card">
+    <h2>Bidding Strategy</h2>
+    <div class="field"><label>Max bid per auction (wei)</label><input id="cfgMaxBid" type="number" /></div>
+    <div class="field"><label>Outbid by (wei)</label><input id="cfgOutbid" type="number" /></div>
+    <div class="field"><label>Max min. contribution (wei)</label><input id="cfgMaxMin" type="number" /></div>
+    <div class="field"><label>Min. time remaining (sec)</label><input id="cfgMinTime" type="number" /></div>
+    <div class="toggle-row">
+      <span style="font-size:13px">Skip if already winning</span>
+      <label class="toggle"><input type="checkbox" id="cfgSkipWin" onchange="saveConfig()"><span class="slider"></span></label>
+    </div>
+    <div style="margin-top:12px">
+      <button class="btn primary" style="width:100%" onclick="saveConfig()">💾 Save Strategy</button>
+    </div>
+  </div>
+</aside>
+
+<!-- ── MAIN CONTENT ── -->
+<div class="content">
+  <div class="section-tabs">
+    <div class="tab active" onclick="showTab('auctions')">Auctions</div>
+    <div class="tab" onclick="showTab('create')">Create Auction</div>
+    <div class="tab" onclick="showTab('winner')">Winner / CSV</div>
+    <div class="tab" onclick="showTab('logs')">Live Logs</div>
+  </div>
+
+  <!-- Tab: Auctions -->
+  <div class="tab-panel active" id="tab-auctions">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
+      <span style="color:var(--muted);font-size:13px" id="auctionMeta">Loading...</span>
+      <button class="btn ghost" onclick="loadAuctions()">↻ Refresh</button>
+    </div>
+    <div class="card" style="padding:0;overflow:hidden">
+      <table id="auctionTable">
+        <thead><tr>
+          <th>Description</th><th>Status</th><th>Highest Bid</th>
+          <th>Bidders</th><th>My Bid</th><th>Actions</th>
+        </tr></thead>
+        <tbody id="auctionBody"><tr><td colspan="6" style="text-align:center;color:var(--muted);padding:30px">Loading...</td></tr></tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Tab: Create Auction -->
+  <div class="tab-panel" id="tab-create">
+    <div class="card" style="max-width:520px">
+      <h2>Create New Auction</h2>
+      <div class="field"><label>Data Description (public)</label><input id="newDesc" placeholder="e.g. Financial time-series Q1 2024" /></div>
+      <div class="field"><label>Data for Sale (revealed to winner only)</label><textarea id="newData" placeholder="The actual data, link, API key, etc."></textarea></div>
+      <div class="field"><label>Minimum Bid (wei)</label><input id="newMinBid" type="number" value="500" /></div>
+      <div class="field"><label>Duration (1–30 minutes)</label><input id="newDuration" type="number" value="10" min="1" max="30" /></div>
+      <button class="btn success" style="width:100%;margin-top:4px" onclick="createAuction()">🚀 Create Auction</button>
+      <div id="createResult" style="margin-top:10px;font-size:12px;color:var(--muted)"></div>
+    </div>
+
+    <div class="card" style="max-width:520px;margin-top:0">
+      <h2>Batch Create (sell-list.json)</h2>
+      <p style="color:var(--muted);font-size:13px;margin-bottom:12px">Edit <code>data/sell-list.json</code> and use Run Once or Start Bot to batch-create.</p>
+      <button class="btn ghost" onclick="runOnce()">⚡ Run a cycle now</button>
+    </div>
+  </div>
+
+  <!-- Tab: Winner -->
+  <div class="tab-panel" id="tab-winner">
+    <div class="card">
+      <h2>Won Auctions & Data Retrieval</h2>
+      <p style="color:var(--muted);font-size:13px;margin-bottom:12px">
+        Checks all closed auctions: retrieves won data, exports CSV for auctions you sold, shows refund status for auctions you lost.
+      </p>
+      <button class="btn success" onclick="checkWinner()">🏆 Check & Retrieve</button>
+      <div id="winnerResult" style="margin-top:14px;font-size:13px"></div>
+    </div>
+  </div>
+
+  <!-- Tab: Logs -->
+  <div class="tab-panel" id="tab-logs">
+    <div class="card">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
+        <h2 style="margin:0">Live Log</h2>
+        <button class="btn ghost" onclick="document.getElementById('logBox').innerHTML=''">Clear</button>
+      </div>
+      <div id="logBox"></div>
+    </div>
+  </div>
+</div>
+</main>
+
+<div class="toast" id="toast"></div>
+
+<script>
+// ── Always point to the Node.js server, regardless of how this file is opened ──
+const API = 'http://localhost:3002';
+let pollInterval = null;
+let logPollInterval = null;
+
+// ── Guard: block if opened as file:// ────────────────────────────
+if (window.location.protocol === 'file:') {
+  document.body.innerHTML = `
+    <div style="min-height:100vh;background:#0d1117;display:flex;align-items:center;justify-content:center;font-family:sans-serif">
+      <div style="background:#161b22;border:1px solid #f87171;border-radius:12px;padding:36px 40px;max-width:520px;text-align:center">
+        <div style="font-size:48px;margin-bottom:16px">🚫</div>
+        <h2 style="color:#f87171;margin-bottom:12px">Wrong way to open this file</h2>
+        <p style="color:#e6edf3;line-height:1.6;margin-bottom:20px">
+          You opened <code style="background:#0d1117;padding:2px 6px;border-radius:4px">admin.html</code> directly as a file.<br>
+          It must be served by the Node.js bot server to work.
+        </p>
+        <div style="background:#0d1117;border-radius:8px;padding:16px;text-align:left;margin-bottom:20px">
+          <p style="color:#8b949e;font-size:12px;margin-bottom:8px">Run this in your terminal:</p>
+          <code style="color:#4ade80;font-size:14px">npm run admin</code>
+          <p style="color:#8b949e;font-size:12px;margin-top:12px;margin-bottom:8px">Then open your browser to:</p>
+          <code style="color:#60a5fa;font-size:14px">http://localhost:3001</code>
+        </div>
+        <button onclick="window.location.href='http://localhost:3001'"
+          style="background:#2563eb;color:#fff;border:none;border-radius:8px;padding:10px 24px;font-size:14px;font-weight:600;cursor:pointer">
+          Try http://localhost:3001 →
+        </button>
+      </div>
+    </div>`;
+  throw new Error('Opened as file:// — please run npm run admin and visit http://localhost:3001');
+}
+
+// ── Init ─────────────────────────────────────────────────────────
+async function init() {
+  await loadStatus();
+  await loadAuctions();
+  startPolling();
+}
+
+function startPolling() {
+  if (pollInterval) clearInterval(pollInterval);
+  pollInterval = setInterval(loadStatus, 5000);
+  logPollInterval = setInterval(loadLogs, 2000);
+}
+
+// ── Status ───────────────────────────────────────────────────────
+async function loadStatus() {
+  try {
+    const s = await get('/api/status');
+    document.getElementById('balETH').textContent    = s.balanceETH;
+    document.getElementById('budgetWei').textContent = s.budgetWei;
+    document.getElementById('statBids').textContent  = s.stats.bids;
+    document.getElementById('statCreated').textContent = s.stats.created;
+    document.getElementById('walletAddr').textContent  = s.wallet;
+    document.getElementById('walletShort').textContent = s.wallet.slice(0,6)+'…'+s.wallet.slice(-4);
+    document.getElementById('statusDot').className   = s.botRunning ? 'on' : '';
+    document.getElementById('lastCycle').textContent = s.lastCycle ? 'Last cycle: '+new Date(s.lastCycle).toLocaleTimeString() : 'Last cycle: never';
+    document.getElementById('btnStart').disabled = s.botRunning;
+    document.getElementById('btnStop').disabled  = !s.botRunning;
+
+    // Mode badge
+    const mb = document.getElementById('modeBadge');
+    mb.textContent = s.config.BOT_MODE.toUpperCase();
+    mb.className = 'badge ' + (s.config.BOT_MODE === 'simulate' ? 'sim' : s.botRunning ? 'live' : 'off');
+
+    // Sync config fields
+    syncConfigUI(s.config);
+  } catch(e) { console.warn('Status poll failed', e); }
+}
+
+function syncConfigUI(cfg) {
+  const set = (id, val) => { const el=document.getElementById(id); if(el&&document.activeElement!==el) el.value=val; };
+  const setChk = (id, val) => { const el=document.getElementById(id); if(el) el.checked = String(val)==='true'; };
+  set('cfgMode',       cfg.BOT_MODE);
+  set('cfgCron',       cfg.AUTO_TRADE_CRON);
+  set('cfgMaxBid',     cfg.MAX_BID_WEI);
+  set('cfgOutbid',     cfg.OUTBID_BY_WEI);
+  set('cfgMaxMin',     cfg.MAX_MIN_CONTRIBUTION_WEI);
+  set('cfgMinTime',    cfg.MIN_TIME_REMAINING_SEC);
+  setChk('cfgSkipWin',   cfg.SKIP_IF_WINNING);
+  setChk('cfgAutoCreate', cfg.AUTO_CREATE_AUCTIONS);
+}
+
+// ── Auctions ─────────────────────────────────────────────────────
+async function loadAuctions() {
+  try {
+    const auctions = await get('/api/auctions');
+    const open = auctions.filter(a => a.isActive).length;
+    document.getElementById('auctionMeta').textContent =
+      `${auctions.length} total · ${open} open`;
+    renderAuctions(auctions);
+  } catch(e) { console.warn('Auction load failed', e); }
+}
+
+function renderAuctions(auctions) {
+  const tbody = document.getElementById('auctionBody');
+  if (!auctions.length) {
+    tbody.innerHTML = `<tr><td colspan="6" style="text-align:center;padding:30px">
+      <div style="color:var(--muted);line-height:1.6">
+        <div style="font-size:14px;margin-bottom:10px">⚠️ No auctions loaded</div>
+        <div style="font-size:12px">
+          This usually means:<br>
+          • Factory address is incorrect<br>
+          • Campaign ABI doesn't match<br>
+          • No auctions exist yet<br><br>
+          <button class="btn ghost" style="padding:4px 8px;font-size:11px" onclick="showDiagnostics()">Run Diagnostics →</button>
+        </div>
+      </div>
+    </td></tr>`;
+    return;
+  }
+  tbody.innerHTML = [...auctions].reverse().map(a => {
+    const statusPill = a.isActive
+      ? `<span class="pill open">🟢 ${fmt(a.secondsLeft)}</span>`
+      : `<span class="pill closed">🔴 Closed</span>`;
+    const myBidPill = a.amIWinning
+      ? `<span class="pill winning">👑 Winning (${a.myBid})</span>`
+      : a.amIBidding
+        ? `<span class="pill">${a.myBid} wei</span>`
+        : a.isManager
+          ? `<span class="pill mine">📦 Yours</span>`
+          : '—';
+    const actions = [];
+    if (a.isActive && !a.isManager) {
+      actions.push(`<button class="btn primary" style="padding:4px 10px;font-size:11px" onclick="quickBid('${a.address}',${a.highestBid},${a.minimumContribution},${a.approversCount})">Bid</button>`);
+    }
+    if (!a.isActive && !a.closed && a.isManager && a.approversCount > 0) {
+      actions.push(`<button class="btn success" style="padding:4px 10px;font-size:11px" onclick="finalize('${a.address}')">Finalize</button>`);
+    }
+    return `<tr>
+      <td><div style="max-width:180px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="${a.dataDescription}">${a.dataDescription||'—'}</div>
+          <div style="font-size:11px;color:var(--muted);font-family:monospace">${a.address.slice(0,10)}…</div></td>
+      <td>${statusPill}</td>
+      <td>${a.highestBid} wei</td>
+      <td>${a.approversCount}</td>
+      <td>${myBidPill}</td>
+      <td>${actions.join(' ')}</td>
+    </tr>`;
+  }).join('');
+}
+
+function fmt(sec) {
+  if (sec<60) return sec+'s';
+  if (sec<3600) return Math.floor(sec/60)+'m '+( sec%60)+'s';
+  return Math.floor(sec/3600)+'h '+Math.floor((sec%3600)/60)+'m';
+}
+
+// ── Quick Bid dialog ──────────────────────────────────────────────
+async function quickBid(addr, highestBid, minContrib, bidderCount) {
+  const suggested = bidderCount === 0
+    ? Number(minContrib)
+    : Number(highestBid) + Number(document.getElementById('cfgOutbid').value || 100);
+  const amt = prompt(`Bid on auction ${addr.slice(0,10)}…\nSuggested: ${suggested} wei\n\nEnter amount (wei):`, suggested);
+  if (!amt) return;
+  try {
+    const r = await post('/api/bid', { address: addr, amountWei: amt });
+    if (r.ok) { toast('✅ Bid placed! TX: '+r.tx.slice(0,12)+'…', 'ok'); loadAuctions(); }
+    else       { toast('❌ '+r.error, 'err'); }
+  } catch(e) { toast('❌ '+e.message, 'err'); }
+}
+
+async function finalize(addr) {
+  if (!confirm('Finalize auction '+addr.slice(0,10)+'…?\nThis will pay you and refund losers.')) return;
+  try {
+    const r = await post('/api/finalize', { address: addr });
+    if (r.ok) { toast('✅ Finalized! TX: '+(r.tx||'').slice(0,12)+'…', 'ok'); loadAuctions(); }
+    else       { toast('❌ '+r.error, 'err'); }
+  } catch(e) { toast('❌ '+e.message, 'err'); }
+}
+
+// ── Create Auction ────────────────────────────────────────────────
+async function createAuction() {
+  const payload = {
+    dataDescription:     document.getElementById('newDesc').value,
+    dataForSell:         document.getElementById('newData').value,
+    minimumContribution: parseInt(document.getElementById('newMinBid').value),
+    auctionDuration:     parseInt(document.getElementById('newDuration').value),
+  };
+  try {
+    const r = await post('/api/create-auction', payload);
+    const el = document.getElementById('createResult');
+    if (r.ok) {
+      el.style.color = '#4ade80';
+      el.textContent = '✅ Created: ' + r.result;
+      toast('✅ Auction created!', 'ok');
+      loadAuctions();
+    } else {
+      el.style.color = '#f87171';
+      el.textContent = '❌ ' + r.error;
+      toast('❌ '+r.error, 'err');
+    }
+  } catch(e) { toast('❌ '+e.message, 'err'); }
+}
+
+// ── Winner ────────────────────────────────────────────────────────
+async function checkWinner() {
+  const el = document.getElementById('winnerResult');
+  el.textContent = 'Checking…';
+  try {
+    const r = await post('/api/check-winner', {});
+    if (r.ok) {
+      const { won, sold, refunded, awaitingRefund } = r.results;
+      el.innerHTML = `
+        <div>🏆 <b>Won:</b> ${won.length} — ${won.map(w=>w.description+': <code>'+(w.data||'pending')+'</code>').join(', ')||'none'}</div>
+        <div>💰 <b>Sold:</b> ${sold.length}</div>
+        <div>✅ <b>Refunds confirmed:</b> ${refunded.length}</div>
+        <div>⏳ <b>Refunds pending:</b> ${awaitingRefund.length}</div>
+        <div style="margin-top:8px;font-size:12px;color:var(--muted)">CSV exports saved to ./logs/</div>
+      `;
+    }
+  } catch(e) { el.textContent = '❌ '+e.message; }
+}
+
+// ── Config / Bot control ─────────────────────────────────────────
+async function saveConfig() {
+  const config = {
+    BOT_MODE:                 document.getElementById('cfgMode').value,
+    MAX_BID_WEI:              document.getElementById('cfgMaxBid').value,
+    OUTBID_BY_WEI:            document.getElementById('cfgOutbid').value,
+    MAX_MIN_CONTRIBUTION_WEI: document.getElementById('cfgMaxMin').value,
+    MIN_TIME_REMAINING_SEC:   document.getElementById('cfgMinTime').value,
+    AUTO_TRADE_CRON:          document.getElementById('cfgCron').value,
+    SKIP_IF_WINNING:          document.getElementById('cfgSkipWin').checked ? 'true' : 'false',
+    AUTO_CREATE_AUCTIONS:     document.getElementById('cfgAutoCreate').checked ? 'true' : 'false',
+  };
+  try {
+    await post('/api/config', config);
+    toast('✅ Config saved', 'ok');
+  } catch(e) { toast('❌ '+e.message, 'err'); }
+}
+
+function setMode(val) {
+  document.getElementById('cfgMode').value = val;
+  saveConfig();
+}
+
+async function botStart() {
+  await saveConfig();
+  await post('/api/start', {});
+  toast('▶ Bot started', 'ok');
+  loadStatus();
+}
+
+async function botStop() {
+  await post('/api/stop', {});
+  toast('■ Bot stopped', 'ok');
+  loadStatus();
+}
+
+async function runOnce() {
+  toast('⚡ Running cycle…', 'ok');
+  await post('/api/run-once', {});
+  setTimeout(()=>{ loadStatus(); loadAuctions(); }, 4000);
+}
+
+// ── Run Mode ─────────────────────────────────────────────────────
+async function runMode(mode) {
+  toast(`🚀 Running ${mode} mode…`, 'ok');
+  try {
+    const res = await post('/api/run-mode', { mode });
+    if (res.ok) {
+      toast(`✅ ${mode} completed`, 'ok');
+    } else {
+      toast(`❌ ${mode} failed: ${res.error}`, 'error');
+    }
+  } catch (err) {
+    toast(`❌ Error: ${err.message}`, 'error');
+  }
+  setTimeout(()=>{ loadStatus(); loadAuctions(); loadLogs(); }, 2000);
+}
+
+// ── Logs ─────────────────────────────────────────────────────────
+async function loadLogs() {
+  if (document.getElementById('tab-logs').classList.contains('active')) {
+    try {
+      const logs = await get('/api/logs');
+      const box = document.getElementById('logBox');
+      box.innerHTML = logs.slice(0,100).map(l =>
+        `<div class="log-${l.level}">[${l.time.slice(11,19)}] ${escHtml(l.msg)}</div>`
+      ).join('');
+    } catch(_) {}
+  }
+}
+
+// ── Diagnostics ──────────────────────────────────────────────────
+async function showDiagnostics() {
+  try {
+    const diag = await get('/api/diagnostics');
+    const status = diag.factoryExists ? '✅' : '❌';
+    
+    let hint = '';
+    if (!diag.factoryExists) {
+      hint = `Factory contract NOT FOUND at\n${diag.factoryAddress}\n\n` +
+              `Fix: Get correct FACTORY_ADDRESS from datamarketplaces.net\n` +
+              `and update your .env file.`;
+    } else if (diag.rawAddressesCount === 0) {
+      hint = `Factory found but NO auctions exist.\n\n` +
+              `This is normal if:\n` +
+              `• You haven't created any auctions yet\n` +
+              `• Or you need to sell/create auctions first`;
+    } else if (diag.validAuctions === 0 && diag.rawAddressesCount > 0) {
+      hint = `Factory found ${diag.rawAddressesCount} auctions but NONE loaded.\n\n` +
+              `This means the Campaign ABI is incorrect.\n\n` +
+              `Fix:\n` +
+              `1. Get correct Campaign.json ABI from datamarketplaces.net\n` +
+              `2. Replace abis/Campaign.json\n` +
+              `3. Restart the bot`;
+    } else {
+      hint = `✅ System operational\n${diag.validAuctions} auctions loaded\n${diag.rawAddressesCount} total available`;
+    }
+    
+    const msg = `${status} SYSTEM CHECK\n` +
+                `━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n` +
+                `Factory: ${diag.factoryExists ? '✅ Exists' : '❌ Not found'}\n` +
+                `Available: ${diag.rawAddressesCount}\n` +
+                `Loaded: ${diag.validAuctions}\n` +
+                `RPC: ${diag.rpcUrl}\n\n` +
+                `${hint}\n` +
+                `━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━`;
+    toast(msg, diag.factoryExists && diag.validAuctions > 0 ? 'ok' : 'warn');
+  } catch (err) {
+    toast(`❌ Diagnostic failed: ${err.message}`, 'error');
+  }
+}
+
+// ── Debug Factory ────────────────────────────────────────────────
+async function debugFactory() {
+  try {
+    const data = await get('/api/factory-raw');
+    const msg = `🐛 FACTORY DEBUG\n` +
+                `━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n` +
+                `${data.message}\n\n` +
+                `First addresses:\n` +
+                data.addresses.map((a, i) => `${i+1}. ${a}`).join('\n') + `\n\n` +
+                `(Use Diagnostics for full status)`;
+    toast(msg, 'ok');
+  } catch (err) {
+    toast(`❌ Debug failed: ${err.message}`, 'error');
+  }
+}
+
+// ── Tabs ─────────────────────────────────────────────────────────
+function showTab(name) {
+  document.querySelectorAll('.tab').forEach((t,i) => {
+    const panels = ['auctions','create','winner','logs'];
+    t.classList.toggle('active', panels[i]===name);
+  });
+  document.querySelectorAll('.tab-panel').forEach(p => {
+    p.classList.toggle('active', p.id==='tab-'+name);
+  });
+  if (name==='auctions') loadAuctions();
+  if (name==='logs')     loadLogs();
+}
+
+// ── Utils ─────────────────────────────────────────────────────────
+async function get(url) {
+  const r = await fetch(API+url);
+  return r.json();
+}
+async function post(url, body) {
+  const r = await fetch(API+url, { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify(body) });
+  return r.json();
+}
+
+let toastTimer;
+function toast(msg, type='ok') {
+  const el = document.getElementById('toast');
+  el.textContent = msg;
+  el.className = 'toast show ' + type;
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(()=> el.className='toast', 3000);
+}
+
+function escHtml(s) {
+  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+
+init();
+</script>
+</body>
+</html>
