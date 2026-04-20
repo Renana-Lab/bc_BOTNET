@@ -18727,3 +18727,195 @@
 {"level":"warn","message":"⚠️  56/56 auctions failed to load — check FACTORY_ADDRESS and Campaign ABI","timestamp":"2026-04-20 14:46:50"}
 {"level":"info","message":"Fetching 56 auctions...","timestamp":"2026-04-20 14:46:55"}
 {"level":"warn","message":"⚠️  56/56 auctions failed to load — check FACTORY_ADDRESS and Campaign ABI","timestamp":"2026-04-20 14:46:55"}
+{"address":"0x6320ee555bE0782AFB1f0E2E022d01AA94EdB4A6","balanceETH":"1.895838","chainId":"11155111","factory":"0xb61Cd17D498f82E9F22771254C31bCBBb5781540","level":"info","message":"✅ Chain initialized","nonce":221,"timestamp":"2026-04-20 15:09:33"}
+{"level":"info","message":"\n🖥️  Admin panel ready!","timestamp":"2026-04-20 15:09:33"}
+{"level":"info","message":"   Open in browser: http://localhost:3002","timestamp":"2026-04-20 15:09:33"}
+{"level":"info","message":"   ⚠️  Do NOT open admin.html directly as a file\n","timestamp":"2026-04-20 15:09:33"}
+{"level":"info","message":"Fetching 56 auctions...","timestamp":"2026-04-20 15:09:34"}
+{"level":"warn","message":"⚠️  56/56 auctions failed to load — check FACTORY_ADDRESS and Campaign ABI","timestamp":"2026-04-20 15:09:34"}
+{"level":"info","message":"Fetching 56 auctions...","timestamp":"2026-04-20 15:09:34"}
+{"level":"warn","message":"⚠️  56/56 auctions failed to load — check FACTORY_ADDRESS and Campaign ABI","timestamp":"2026-04-20 15:09:34"}
+{"level":"info","message":"Fetching 56 auctions...","timestamp":"2026-04-20 15:09:38"}
+{"level":"warn","message":"⚠️  56/56 auctions failed to load — check FACTORY_ADDRESS and Campaign ABI","timestamp":"2026-04-20 15:09:38"}
+{"level":"info","message":"Fetching 56 auctions...","timestamp":"2026-04-20 15:09:38"}
+{"level":"warn","message":"⚠️  56/56 auctions failed to load — check FACTORY_ADDRESS and Campaign ABI","timestamp":"2026-04-20 15:09:38"}
+{"level":"info","message":"Fetching 56 auctions...","timestamp":"2026-04-20 15:09:44"}
+{"level":"warn","message":"⚠️  56/56 auctions failed to load — check FACTORY_ADDRESS and Campaign ABI","timestamp":"2026-04-20 15:09:44"}
+{"level":"info","message":"Fetching 56 auctions...","timestamp":"2026-04-20 15:09:48"}
+{"level":"warn","message":"⚠️  56/56 auctions failed to load — check FACTORY_ADDRESS and Campaign ABI","timestamp":"2026-04-20 15:09:49"}
+{"AUTO_CREATE_AUCTIONS":"false","AUTO_TRADE_CRON":"*/2 * * * *","BOT_MODE":"simulate","MAX_BID_WEI":"5000","MAX_MIN_CONTRIBUTION_WEI":"2000","MIN_TIME_REMAINING_SEC":"60","OUTBID_BY_WEI":"100","SKIP_IF_WINNING":"true","level":"info","message":"⚙️  Config updated","timestamp":"2026-04-20 15:09:50"}
+{"level":"info","message":"🤖 Bot started — cron: */2 * * * *","timestamp":"2026-04-20 15:09:50"}
+{"level":"info","message":"\n⚡ Cycle #1","timestamp":"2026-04-20 15:09:50"}
+{"level":"info","message":"Fetching 57 auctions...","timestamp":"2026-04-20 15:09:50"}
+{"level":"warn","message":"⚠️  57/57 auctions failed to load — check FACTORY_ADDRESS and Campaign ABI","timestamp":"2026-04-20 15:09:50"}
+{"budget":"1500 wei","level":"info","maxBid":"5000","message":"Bidder running","mode":"SIMULATE","outbidBy":"100","timestamp":"2026-04-20 15:09:50"}
+{"level":"info","message":"Fetching 57 auctions...","timestamp":"2026-04-20 15:09:51"}
+{"level":"warn","message":"⚠️  57/57 auctions failed to load — check FACTORY_ADDRESS and Campaign ABI","timestamp":"2026-04-20 15:09:51"}
+{"level":"info","message":"Fetching 57 auctions...","timestamp":"2026-04-20 15:09:53"}
+{"level":"warn","message":"⚠️  57/57 auctions failed to load — check FACTORY_ADDRESS and Campaign ABI","timestamp":"2026-04-20 15:09:54"}
+{"level":"info","message":"Fetching 57 auctions...","timestamp":"2026-04-20 15:09:58"}
+{"level":"warn","message":"⚠️  57/57 auctions failed to load — check FACTORY_ADDRESS and Campaign ABI","timestamp":"2026-04-20 15:09:59"}
+{"level":"info","message":"Fetching 57 auctions...","timestamp":"2026-04-20 15:09:59"}
+{"level":"warn","message":"⚠️  57/57 auctions failed to load — check FACTORY_ADDRESS and Campaign ABI","timestamp":"2026-04-20 15:09:59"}
+{"level":"info","message":"\n⚡ Cycle #2","timestamp":"2026-04-20 15:10:00"}
+{"level":"info","message":"Fetching 57 auctions...","timestamp":"2026-04-20 15:10:00"}
+{"level":"warn","message":"⚠️  57/57 auctions failed to load — check FACTORY_ADDRESS and Campaign ABI","timestamp":"2026-04-20 15:10:00"}
+{"budget":"1500 wei","level":"info","maxBid":"5000","message":"Bidder running","mode":"SIMULATE","outbidBy":"100","timestamp":"2026-04-20 15:10:00"}
+{"level":"info","message":"Fetching 57 auctions...","timestamp":"2026-04-20 15:10:01"}
+{"level":"warn","message":"⚠️  57/57 auctions failed to load — check FACTORY_ADDRESS and Campaign ABI","timestamp":"2026-04-20 15:10:01"}
+{"level":"info","message":"Fetching 57 auctions...","timestamp":"2026-04-20 15:10:02"}
+{"level":"warn","message":"⚠️  57/57 auctions failed to load — check FACTORY_ADDRESS and Campaign ABI","timestamp":"2026-04-20 15:10:02"}
+{"level":"info","message":"Fetching 57 auctions...","timestamp":"2026-04-20 15:10:02"}
+{"level":"warn","message":"⚠️  57/57 auctions failed to load — check FACTORY_ADDRESS and Campaign ABI","timestamp":"2026-04-20 15:10:03"}
+{"level":"info","message":"Fetching 57 auctions...","timestamp":"2026-04-20 15:10:03"}
+{"level":"warn","message":"⚠️  57/57 auctions failed to load — check FACTORY_ADDRESS and Campaign ABI","timestamp":"2026-04-20 15:10:03"}
+{"level":"info","message":"Fetching 57 auctions...","timestamp":"2026-04-20 15:10:03"}
+{"level":"warn","message":"⚠️  57/57 auctions failed to load — check FACTORY_ADDRESS and Campaign ABI","timestamp":"2026-04-20 15:10:03"}
+{"level":"info","message":"Fetching 57 auctions...","timestamp":"2026-04-20 15:10:04"}
+{"level":"warn","message":"⚠️  57/57 auctions failed to load — check FACTORY_ADDRESS and Campaign ABI","timestamp":"2026-04-20 15:10:04"}
+{"AUTO_CREATE_AUCTIONS":"false","AUTO_TRADE_CRON":"*/2 * * * *","BOT_MODE":"buy","MAX_BID_WEI":"5000","MAX_MIN_CONTRIBUTION_WEI":"2000","MIN_TIME_REMAINING_SEC":"60","OUTBID_BY_WEI":"100","SKIP_IF_WINNING":"true","level":"info","message":"⚙️  Config updated","timestamp":"2026-04-20 15:10:06"}
+{"level":"info","message":"Fetching 57 auctions...","timestamp":"2026-04-20 15:10:08"}
+{"level":"warn","message":"⚠️  57/57 auctions failed to load — check FACTORY_ADDRESS and Campaign ABI","timestamp":"2026-04-20 15:10:09"}
+{"level":"info","message":"Fetching 57 auctions...","timestamp":"2026-04-20 15:10:09"}
+{"level":"warn","message":"⚠️  57/57 auctions failed to load — check FACTORY_ADDRESS and Campaign ABI","timestamp":"2026-04-20 15:10:09"}
+{"budget":"1500 wei","level":"info","maxBid":"5000","message":"Bidder running","mode":"NORMAL","outbidBy":"100","timestamp":"2026-04-20 15:10:09"}
+{"level":"info","message":"Buy mode: 0 bids placed","timestamp":"2026-04-20 15:10:09"}
+{"level":"info","message":"Fetching 57 auctions...","timestamp":"2026-04-20 15:10:11"}
+{"level":"warn","message":"⚠️  57/57 auctions failed to load — check FACTORY_ADDRESS and Campaign ABI","timestamp":"2026-04-20 15:10:12"}
+{"level":"info","message":"Fetching 57 auctions...","timestamp":"2026-04-20 15:10:12"}
+{"level":"warn","message":"⚠️  57/57 auctions failed to load — check FACTORY_ADDRESS and Campaign ABI","timestamp":"2026-04-20 15:10:12"}
+{"level":"info","message":"Fetching 57 auctions...","timestamp":"2026-04-20 15:10:13"}
+{"level":"warn","message":"⚠️  57/57 auctions failed to load — check FACTORY_ADDRESS and Campaign ABI","timestamp":"2026-04-20 15:10:14"}
+{"level":"info","message":"Fetching 57 auctions...","timestamp":"2026-04-20 15:10:18"}
+{"level":"warn","message":"⚠️  57/57 auctions failed to load — check FACTORY_ADDRESS and Campaign ABI","timestamp":"2026-04-20 15:10:19"}
+{"level":"info","message":"Fetching 57 auctions...","timestamp":"2026-04-20 15:10:20"}
+{"level":"warn","message":"⚠️  57/57 auctions failed to load — check FACTORY_ADDRESS and Campaign ABI","timestamp":"2026-04-20 15:10:20"}
+{"level":"info","message":"Fetching 57 auctions...","timestamp":"2026-04-20 15:10:22"}
+{"level":"warn","message":"⚠️  57/57 auctions failed to load — check FACTORY_ADDRESS and Campaign ABI","timestamp":"2026-04-20 15:10:22"}
+{"level":"info","message":"Fetching 57 auctions...","timestamp":"2026-04-20 15:10:23"}
+{"level":"warn","message":"⚠️  57/57 auctions failed to load — check FACTORY_ADDRESS and Campaign ABI","timestamp":"2026-04-20 15:10:23"}
+{"AUTO_CREATE_AUCTIONS":"true","AUTO_TRADE_CRON":"*/2 * * * *","BOT_MODE":"buy","MAX_BID_WEI":"5000","MAX_MIN_CONTRIBUTION_WEI":"2000","MIN_TIME_REMAINING_SEC":"60","OUTBID_BY_WEI":"100","SKIP_IF_WINNING":"true","level":"info","message":"⚙️  Config updated","timestamp":"2026-04-20 15:10:26"}
+{"level":"info","message":"Fetching 57 auctions...","timestamp":"2026-04-20 15:10:28"}
+{"level":"warn","message":"⚠️  57/57 auctions failed to load — check FACTORY_ADDRESS and Campaign ABI","timestamp":"2026-04-20 15:10:29"}
+{"level":"info","message":"Fetching 57 auctions...","timestamp":"2026-04-20 15:10:29"}
+{"level":"warn","message":"⚠️  57/57 auctions failed to load — check FACTORY_ADDRESS and Campaign ABI","timestamp":"2026-04-20 15:10:29"}
+{"level":"info","message":"\nProcessing 0 closed auction(s)...","timestamp":"2026-04-20 15:10:29"}
+{"level":"info","message":"\nWinner Report: won=0 sold=0 refunded=0 pending=0\n","timestamp":"2026-04-20 15:10:29"}
+{"level":"info","message":"Fetching 57 auctions...","timestamp":"2026-04-20 15:10:32"}
+{"level":"warn","message":"⚠️  57/57 auctions failed to load — check FACTORY_ADDRESS and Campaign ABI","timestamp":"2026-04-20 15:10:32"}
+{"level":"info","message":"Fetching 57 auctions...","timestamp":"2026-04-20 15:10:32"}
+{"level":"warn","message":"⚠️  57/57 auctions failed to load — check FACTORY_ADDRESS and Campaign ABI","timestamp":"2026-04-20 15:10:32"}
+{"level":"info","message":"Fetching 57 auctions...","timestamp":"2026-04-20 15:10:33"}
+{"level":"warn","message":"⚠️  57/57 auctions failed to load — check FACTORY_ADDRESS and Campaign ABI","timestamp":"2026-04-20 15:10:34"}
+{"level":"info","message":"Fetching 57 auctions...","timestamp":"2026-04-20 15:10:38"}
+{"level":"warn","message":"⚠️  57/57 auctions failed to load — check FACTORY_ADDRESS and Campaign ABI","timestamp":"2026-04-20 15:10:38"}
+{"level":"info","message":"Fetching 57 auctions...","timestamp":"2026-04-20 15:10:39"}
+{"level":"warn","message":"⚠️  57/57 auctions failed to load — check FACTORY_ADDRESS and Campaign ABI","timestamp":"2026-04-20 15:10:39"}
+{"budget":"1500 wei","level":"info","maxBid":"5000","message":"Bidder running","mode":"NORMAL","outbidBy":"100","timestamp":"2026-04-20 15:10:39"}
+{"level":"info","message":"Buy mode: 0 bids placed","timestamp":"2026-04-20 15:10:39"}
+{"level":"info","message":"Fetching 57 auctions...","timestamp":"2026-04-20 15:10:39"}
+{"level":"warn","message":"⚠️  57/57 auctions failed to load — check FACTORY_ADDRESS and Campaign ABI","timestamp":"2026-04-20 15:10:39"}
+{"level":"info","message":"Fetching 57 auctions...","timestamp":"2026-04-20 15:10:39"}
+{"level":"warn","message":"⚠️  57/57 auctions failed to load — check FACTORY_ADDRESS and Campaign ABI","timestamp":"2026-04-20 15:10:39"}
+{"budget":"1500 wei","level":"info","maxBid":"5000","message":"Bidder running","mode":"NORMAL","outbidBy":"100","timestamp":"2026-04-20 15:10:39"}
+{"level":"info","message":"Buy mode: 0 bids placed","timestamp":"2026-04-20 15:10:39"}
+{"budget":"1500 wei","level":"info","maxBid":"5000","message":"Bidder running","mode":"NORMAL","outbidBy":"100","timestamp":"2026-04-20 15:10:40"}
+{"level":"info","message":"Buy mode: 0 bids placed","timestamp":"2026-04-20 15:10:40"}
+{"level":"info","message":"Fetching 57 auctions...","timestamp":"2026-04-20 15:10:40"}
+{"level":"warn","message":"⚠️  57/57 auctions failed to load — check FACTORY_ADDRESS and Campaign ABI","timestamp":"2026-04-20 15:10:40"}
+{"budget":"1500 wei","level":"info","maxBid":"5000","message":"Bidder running","mode":"NORMAL","outbidBy":"100","timestamp":"2026-04-20 15:10:40"}
+{"level":"info","message":"Buy mode: 0 bids placed","timestamp":"2026-04-20 15:10:40"}
+{"level":"info","message":"Fetching 57 auctions...","timestamp":"2026-04-20 15:10:41"}
+{"level":"warn","message":"⚠️  57/57 auctions failed to load — check FACTORY_ADDRESS and Campaign ABI","timestamp":"2026-04-20 15:10:41"}
+{"level":"info","message":"Fetching 57 auctions...","timestamp":"2026-04-20 15:10:41"}
+{"level":"warn","message":"⚠️  57/57 auctions failed to load — check FACTORY_ADDRESS and Campaign ABI","timestamp":"2026-04-20 15:10:42"}
+{"level":"info","message":"Fetching 57 auctions...","timestamp":"2026-04-20 15:10:42"}
+{"level":"warn","message":"⚠️  57/57 auctions failed to load — check FACTORY_ADDRESS and Campaign ABI","timestamp":"2026-04-20 15:10:42"}
+{"level":"info","message":"Fetching 57 auctions...","timestamp":"2026-04-20 15:10:42"}
+{"level":"warn","message":"⚠️  57/57 auctions failed to load — check FACTORY_ADDRESS and Campaign ABI","timestamp":"2026-04-20 15:10:42"}
+{"level":"info","message":"Fetching 57 auctions...","timestamp":"2026-04-20 15:10:42"}
+{"level":"warn","message":"⚠️  57/57 auctions failed to load — check FACTORY_ADDRESS and Campaign ABI","timestamp":"2026-04-20 15:10:42"}
+{"level":"info","message":"Fetching 57 auctions...","timestamp":"2026-04-20 15:10:42"}
+{"level":"warn","message":"⚠️  57/57 auctions failed to load — check FACTORY_ADDRESS and Campaign ABI","timestamp":"2026-04-20 15:10:42"}
+{"level":"info","message":"Fetching 57 auctions...","timestamp":"2026-04-20 15:10:43"}
+{"level":"warn","message":"⚠️  57/57 auctions failed to load — check FACTORY_ADDRESS and Campaign ABI","timestamp":"2026-04-20 15:10:43"}
+{"level":"info","message":"Fetching 57 auctions...","timestamp":"2026-04-20 15:10:43"}
+{"level":"warn","message":"⚠️  57/57 auctions failed to load — check FACTORY_ADDRESS and Campaign ABI","timestamp":"2026-04-20 15:10:43"}
+{"level":"info","message":"Fetching 57 auctions...","timestamp":"2026-04-20 15:10:44"}
+{"level":"warn","message":"⚠️  57/57 auctions failed to load — check FACTORY_ADDRESS and Campaign ABI","timestamp":"2026-04-20 15:10:44"}
+{"level":"info","message":"Fetching 57 auctions...","timestamp":"2026-04-20 15:10:48"}
+{"level":"warn","message":"⚠️  57/57 auctions failed to load — check FACTORY_ADDRESS and Campaign ABI","timestamp":"2026-04-20 15:10:49"}
+{"level":"info","message":"🛑 Bot stopped","timestamp":"2026-04-20 15:10:49"}
+{"level":"info","message":"Fetching 57 auctions...","timestamp":"2026-04-20 15:10:49"}
+{"level":"warn","message":"⚠️  57/57 auctions failed to load — check FACTORY_ADDRESS and Campaign ABI","timestamp":"2026-04-20 15:10:49"}
+{"AUTO_CREATE_AUCTIONS":"true","AUTO_TRADE_CRON":"*/2 * * * *","BOT_MODE":"auto","MAX_BID_WEI":"5000","MAX_MIN_CONTRIBUTION_WEI":"2000","MIN_TIME_REMAINING_SEC":"60","OUTBID_BY_WEI":"100","SKIP_IF_WINNING":"true","level":"info","message":"⚙️  Config updated","timestamp":"2026-04-20 15:10:52"}
+{"level":"info","message":"Fetching 57 auctions...","timestamp":"2026-04-20 15:10:53"}
+{"level":"warn","message":"⚠️  57/57 auctions failed to load — check FACTORY_ADDRESS and Campaign ABI","timestamp":"2026-04-20 15:10:54"}
+{"level":"info","message":"Fetching 57 auctions...","timestamp":"2026-04-20 15:10:58"}
+{"level":"warn","message":"⚠️  57/57 auctions failed to load — check FACTORY_ADDRESS and Campaign ABI","timestamp":"2026-04-20 15:10:59"}
+{"level":"info","message":"Fetching 57 auctions...","timestamp":"2026-04-20 15:10:59"}
+{"level":"warn","message":"⚠️  57/57 auctions failed to load — check FACTORY_ADDRESS and Campaign ABI","timestamp":"2026-04-20 15:10:59"}
+{"level":"error","message":"sell-list.json not found at: C:\\Users\\Programmers\\Desktop\\bc_SUPERBOT\\files\\sell-list.json","timestamp":"2026-04-20 15:10:59"}
+{"level":"info","message":"Smart: Created 0 auctions","timestamp":"2026-04-20 15:10:59"}
+{"budget":"1500 wei","level":"info","maxBid":"10000","message":"Bidder running","mode":"SMART","outbidBy":"200","timestamp":"2026-04-20 15:10:59"}
+{"level":"info","message":"Smart: 0 bids placed","timestamp":"2026-04-20 15:10:59"}
+{"AUTO_CREATE_AUCTIONS":"true","AUTO_TRADE_CRON":"*/2 * * * *","BOT_MODE":"auto","MAX_BID_WEI":"5000","MAX_MIN_CONTRIBUTION_WEI":"2000","MIN_TIME_REMAINING_SEC":"60","OUTBID_BY_WEI":"100","SKIP_IF_WINNING":"true","level":"info","message":"⚙️  Config updated","timestamp":"2026-04-20 15:10:59"}
+{"level":"info","message":"🤖 Bot started — cron: */2 * * * *","timestamp":"2026-04-20 15:10:59"}
+{"level":"info","message":"\n⚡ Cycle #3","timestamp":"2026-04-20 15:10:59"}
+{"level":"info","message":"Fetching 57 auctions...","timestamp":"2026-04-20 15:11:00"}
+{"level":"warn","message":"⚠️  57/57 auctions failed to load — check FACTORY_ADDRESS and Campaign ABI","timestamp":"2026-04-20 15:11:00"}
+{"level":"info","message":"No open auctions — auto-creating...","timestamp":"2026-04-20 15:11:00"}
+{"level":"error","message":"sell-list.json not found at: C:\\Users\\Programmers\\Desktop\\bc_SUPERBOT\\files\\sell-list.json","timestamp":"2026-04-20 15:11:00"}
+{"budget":"1500 wei","level":"info","maxBid":"5000","message":"Bidder running","mode":"NORMAL","outbidBy":"100","timestamp":"2026-04-20 15:11:00"}
+{"level":"info","message":"Fetching 57 auctions...","timestamp":"2026-04-20 15:11:00"}
+{"level":"warn","message":"⚠️  57/57 auctions failed to load — check FACTORY_ADDRESS and Campaign ABI","timestamp":"2026-04-20 15:11:00"}
+{"level":"info","message":"Fetching 57 auctions...","timestamp":"2026-04-20 15:11:01"}
+{"level":"warn","message":"⚠️  57/57 auctions failed to load — check FACTORY_ADDRESS and Campaign ABI","timestamp":"2026-04-20 15:11:01"}
+{"level":"info","message":"Fetching 57 auctions...","timestamp":"2026-04-20 15:11:02"}
+{"level":"warn","message":"⚠️  57/57 auctions failed to load — check FACTORY_ADDRESS and Campaign ABI","timestamp":"2026-04-20 15:11:02"}
+{"level":"info","message":"Fetching 57 auctions...","timestamp":"2026-04-20 15:11:03"}
+{"level":"warn","message":"⚠️  57/57 auctions failed to load — check FACTORY_ADDRESS and Campaign ABI","timestamp":"2026-04-20 15:11:04"}
+{"level":"info","message":"Fetching 57 auctions...","timestamp":"2026-04-20 15:11:08"}
+{"level":"warn","message":"⚠️  57/57 auctions failed to load — check FACTORY_ADDRESS and Campaign ABI","timestamp":"2026-04-20 15:11:09"}
+{"level":"info","message":"Fetching 57 auctions...","timestamp":"2026-04-20 15:11:13"}
+{"level":"warn","message":"⚠️  57/57 auctions failed to load — check FACTORY_ADDRESS and Campaign ABI","timestamp":"2026-04-20 15:11:14"}
+{"level":"info","message":"Fetching 57 auctions...","timestamp":"2026-04-20 15:11:18"}
+{"level":"warn","message":"⚠️  57/57 auctions failed to load — check FACTORY_ADDRESS and Campaign ABI","timestamp":"2026-04-20 15:11:19"}
+{"level":"info","message":"Fetching 57 auctions...","timestamp":"2026-04-20 15:11:23"}
+{"level":"warn","message":"⚠️  57/57 auctions failed to load — check FACTORY_ADDRESS and Campaign ABI","timestamp":"2026-04-20 15:11:23"}
+{"level":"info","message":"Fetching 57 auctions...","timestamp":"2026-04-20 15:11:27"}
+{"level":"warn","message":"⚠️  57/57 auctions failed to load — check FACTORY_ADDRESS and Campaign ABI","timestamp":"2026-04-20 15:11:27"}
+{"level":"info","message":"Fetching 57 auctions...","timestamp":"2026-04-20 15:11:28"}
+{"level":"warn","message":"⚠️  57/57 auctions failed to load — check FACTORY_ADDRESS and Campaign ABI","timestamp":"2026-04-20 15:11:29"}
+{"level":"info","message":"Fetching 57 auctions...","timestamp":"2026-04-20 15:11:33"}
+{"level":"warn","message":"⚠️  57/57 auctions failed to load — check FACTORY_ADDRESS and Campaign ABI","timestamp":"2026-04-20 15:11:34"}
+{"level":"info","message":"Fetching 57 auctions...","timestamp":"2026-04-20 15:11:39"}
+{"level":"warn","message":"⚠️  57/57 auctions failed to load — check FACTORY_ADDRESS and Campaign ABI","timestamp":"2026-04-20 15:11:39"}
+{"level":"info","message":"Fetching 57 auctions...","timestamp":"2026-04-20 15:11:44"}
+{"level":"warn","message":"⚠️  57/57 auctions failed to load — check FACTORY_ADDRESS and Campaign ABI","timestamp":"2026-04-20 15:11:44"}
+{"level":"info","message":"Fetching 57 auctions...","timestamp":"2026-04-20 15:11:49"}
+{"level":"warn","message":"⚠️  57/57 auctions failed to load — check FACTORY_ADDRESS and Campaign ABI","timestamp":"2026-04-20 15:11:49"}
+{"level":"info","message":"Fetching 57 auctions...","timestamp":"2026-04-20 15:11:54"}
+{"level":"warn","message":"⚠️  57/57 auctions failed to load — check FACTORY_ADDRESS and Campaign ABI","timestamp":"2026-04-20 15:11:54"}
+{"level":"info","message":"Fetching 57 auctions...","timestamp":"2026-04-20 15:11:59"}
+{"level":"warn","message":"⚠️  57/57 auctions failed to load — check FACTORY_ADDRESS and Campaign ABI","timestamp":"2026-04-20 15:11:59"}
+{"level":"info","message":"\n⚡ Cycle #4","timestamp":"2026-04-20 15:12:00"}
+{"level":"info","message":"Fetching 57 auctions...","timestamp":"2026-04-20 15:12:00"}
+{"level":"warn","message":"⚠️  57/57 auctions failed to load — check FACTORY_ADDRESS and Campaign ABI","timestamp":"2026-04-20 15:12:00"}
+{"level":"info","message":"No open auctions — auto-creating...","timestamp":"2026-04-20 15:12:00"}
+{"level":"error","message":"sell-list.json not found at: C:\\Users\\Programmers\\Desktop\\bc_SUPERBOT\\files\\sell-list.json","timestamp":"2026-04-20 15:12:00"}
+{"budget":"1500 wei","level":"info","maxBid":"5000","message":"Bidder running","mode":"NORMAL","outbidBy":"100","timestamp":"2026-04-20 15:12:00"}
+{"level":"info","message":"Fetching 57 auctions...","timestamp":"2026-04-20 15:12:04"}
+{"level":"warn","message":"⚠️  57/57 auctions failed to load — check FACTORY_ADDRESS and Campaign ABI","timestamp":"2026-04-20 15:12:04"}
+{"level":"info","message":"Fetching 57 auctions...","timestamp":"2026-04-20 15:12:09"}
+{"level":"warn","message":"⚠️  57/57 auctions failed to load — check FACTORY_ADDRESS and Campaign ABI","timestamp":"2026-04-20 15:12:09"}
+{"level":"info","message":"Fetching 57 auctions...","timestamp":"2026-04-20 15:12:14"}
+{"level":"warn","message":"⚠️  57/57 auctions failed to load — check FACTORY_ADDRESS and Campaign ABI","timestamp":"2026-04-20 15:12:14"}
+{"level":"info","message":"Fetching 57 auctions...","timestamp":"2026-04-20 15:12:19"}
+{"level":"warn","message":"⚠️  57/57 auctions failed to load — check FACTORY_ADDRESS and Campaign ABI","timestamp":"2026-04-20 15:12:19"}
+{"level":"info","message":"Fetching 57 auctions...","timestamp":"2026-04-20 15:12:24"}
+{"level":"warn","message":"⚠️  57/57 auctions failed to load — check FACTORY_ADDRESS and Campaign ABI","timestamp":"2026-04-20 15:12:24"}
+{"level":"info","message":"Fetching 57 auctions...","timestamp":"2026-04-20 15:12:29"}
+{"level":"warn","message":"⚠️  57/57 auctions failed to load — check FACTORY_ADDRESS and Campaign ABI","timestamp":"2026-04-20 15:12:29"}
+{"level":"info","message":"Fetching 57 auctions...","timestamp":"2026-04-20 15:12:34"}
+{"level":"warn","message":"⚠️  57/57 auctions failed to load — check FACTORY_ADDRESS and Campaign ABI","timestamp":"2026-04-20 15:12:34"}

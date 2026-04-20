@@ -1,6 +1,7 @@
 {
   "name": "datamarketplace-bot",
   "version": "2.0.0",
+<<<<<<< HEAD
   "description": "Automated auction bot for datamarketplaces.net",
   "main": "index.js",
   "type": "commonjs",
@@ -12,6 +13,16 @@
     "sell":     "node index.js --mode=sell",
     "smart":    "node index.js --mode=smart",
     "dumb":     "node index.js --mode=dumb",
+=======
+  "description": "Automated auction bot for datamarketplaces.net — direct smart contract integration (Sepolia)",
+  "main": "src/index.js",
+  "type": "commonjs",
+  "scripts": {
+    "start":    "node index.js",
+    "simulate": "node index.js --mode=simulate",
+    "buy":      "node index.js --mode=buy",
+    "sell":     "node index.js --mode=sell",
+>>>>>>> fceb3ee0a64fd3207910a19e4b7d3ab9011c4c0a
     "auto":     "node index.js --mode=auto",
     "status":   "node index.js --mode=status",
     "winner":   "node index.js --mode=winner",
