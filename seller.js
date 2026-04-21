@@ -1,72 +1,78 @@
-<<<<<<< HEAD
-// seller.js — creates auctions via factory.createCampaign()
-const { getFactory, getAccount, buildTxParams, resyncNonce, unwrapError } = require('./chain');
-const logger = require('./logger');
-const fs   = require('fs');
-const path = require('path');
-
-=======
-// src/seller.js
-// Creates new data auctions by calling factory.createCampaign()
-// Mirrors exactly what NewAuctionPage.js does.
-
-const { getFactory, getAccount } = require('./chain');
+const { getFactory, getAccount, buildTxParams, resyncNonce, retryRpc, unwrapError } = require('./chain');
 const logger = require('./logger');
 const fs = require('fs');
 const path = require('path');
 
-/**
- * Create a single auction listing.
- *
- * @param {object} item
- * @param {number} item.minimumContribution  - min bid in Wei (positive integer)
- * @param {string} item.dataForSell          - the actual data string being sold
- * @param {string} item.dataDescription      - public description visible in the list
- * @param {number} item.auctionDuration      - duration in MINUTES (1–30), as per the contract
- */
->>>>>>> fceb3ee0a64fd3207910a19e4b7d3ab9011c4c0a
+const GENERATED_CATALOG = [
+  {
+    theme: 'Wallet behavior bundle',
+    descriptions: [
+      'Cross-wallet behavioral signals for active marketplace traders',
+      'Wallet engagement clusters with purchase-intent scoring',
+      'Bid-response timing fingerprints across recent data buyers',
+    ],
+    payloads: [
+      'ipfs://generated/wallet-behavior-pack-a.json',
+      'ipfs://generated/wallet-engagement-clusters-b.json',
+      'ipfs://generated/bid-timing-fingerprints-c.json',
+    ],
+    minBidRange: [180, 420],
+    durationRange: [5, 12],
+  },
+  {
+    theme: 'Consumer intelligence feed',
+    descriptions: [
+      'Fresh browsing-intent segments for high-spend crypto consumers',
+      'Category-level shopping propensity feed with confidence labels',
+      'Marketplace demand heatmap for niche digital goods buyers',
+    ],
+    payloads: [
+      'ipfs://generated/consumer-intel-feed-a.csv',
+      'ipfs://generated/shopping-propensity-feed-b.csv',
+      'ipfs://generated/demand-heatmap-c.csv',
+    ],
+    minBidRange: [220, 560],
+    durationRange: [6, 15],
+  },
+  {
+    theme: 'Synthetic identity graph',
+    descriptions: [
+      'Synthetic profile graph linking wallets, devices, and browsing cohorts',
+      'Identity-resolution sample pack with confidence-weighted edges',
+      'Audience graph snapshot for retargeting experiments on Sepolia',
+    ],
+    payloads: [
+      'ipfs://generated/identity-graph-a.parquet',
+      'ipfs://generated/resolution-edges-b.parquet',
+      'ipfs://generated/audience-graph-c.parquet',
+    ],
+    minBidRange: [300, 800],
+    durationRange: [8, 18],
+  },
+];
+
 async function createAuction(item) {
   const simulate = process.env.BOT_MODE === 'simulate';
-  const factory  = getFactory();
-  const account  = getAccount();
-<<<<<<< HEAD
-=======
-
-  // Validate — mirrors NewAuctionPage.js validateForm()
->>>>>>> fceb3ee0a64fd3207910a19e4b7d3ab9011c4c0a
+  const factory = getFactory();
+  const account = getAccount();
   const { minimumContribution, dataForSell, dataDescription, auctionDuration } = item;
 
-  if (!Number.isInteger(Number(minimumContribution)) || Number(minimumContribution) <= 0)
+  if (!Number.isInteger(Number(minimumContribution)) || Number(minimumContribution) <= 0) {
     throw new Error(`minimumContribution must be a positive integer (got: ${minimumContribution})`);
-<<<<<<< HEAD
-  if (!Number.isInteger(Number(auctionDuration)) || auctionDuration < 1 || auctionDuration > 30)
-    throw new Error(`auctionDuration must be 1–30 minutes (got: ${auctionDuration})`);
-  if (!String(dataForSell).trim())        throw new Error('dataForSell cannot be empty');
-  if (!String(dataDescription).trim())    throw new Error('dataDescription cannot be empty');
+  }
+  if (!Number.isInteger(Number(auctionDuration)) || Number(auctionDuration) < 1 || Number(auctionDuration) > 30) {
+    throw new Error(`auctionDuration must be between 1 and 30 minutes (got: ${auctionDuration})`);
+  }
+  if (!String(dataForSell || '').trim()) throw new Error('dataForSell cannot be empty');
+  if (!String(dataDescription || '').trim()) throw new Error('dataDescription cannot be empty');
 
-  logger.info(`Creating auction: "${dataDescription}"`, {
-    minBid: minimumContribution + ' wei', duration: auctionDuration + ' min',
-=======
-
-  if (!Number.isInteger(Number(auctionDuration)) || auctionDuration < 1 || auctionDuration > 30)
-    throw new Error(`auctionDuration must be an integer between 1 and 30 (got: ${auctionDuration})`);
-
-  if (!String(dataForSell).trim())
-    throw new Error('dataForSell cannot be empty');
-
-  if (!String(dataDescription).trim())
-    throw new Error('dataDescription cannot be empty');
-
-  logger.info(`Creating auction: "${dataDescription}"`, {
-    minBid: minimumContribution + ' wei',
-    duration: auctionDuration + ' min',
->>>>>>> fceb3ee0a64fd3207910a19e4b7d3ab9011c4c0a
+  logger.info(`Creating auction "${dataDescription}"`, {
+    minBidWei: String(minimumContribution),
+    durationMin: String(auctionDuration),
     mode: simulate ? 'SIMULATE' : 'LIVE',
   });
 
   if (simulate) {
-<<<<<<< HEAD
-    logger.info(`  [SIMULATE] Would call factory.createCampaign(...)`);
     return { simulated: true };
   }
 
@@ -77,99 +83,112 @@ async function createAuction(item) {
       String(dataDescription),
       String(auctionDuration),
     ];
-    const gas = await factory.methods.createCampaign(...args).estimateGas({ from: account.address });
+    const gas = await retryRpc(() => factory.methods.createCampaign(...args).estimateGas({ from: account.address }));
     const txParams = await buildTxParams({ gas: Math.ceil(Number(gas) * 1.2).toString() });
-    const receipt  = await factory.methods.createCampaign(...args).send(txParams);
+    const receipt = await retryRpc(() => factory.methods.createCampaign(...args).send(txParams), 2, 1000);
     const newAddress = receipt.events?.AuctionCreated?.returnValues?.campaignAddress;
-    logger.info(`  ✅ Auction created`, { tx: receipt.transactionHash, address: newAddress });
     return { receipt, newAddress };
   } catch (err) {
-    const reason = unwrapError(err);
     await resyncNonce();
-    throw new Error(reason);
+    throw new Error(unwrapError(err));
   }
 }
 
 async function createAuctionsFromConfig(configPath) {
-  // Default: sell-list.json in same folder as this file
   const resolved = configPath
     ? path.resolve(configPath)
-    : path.join(__dirname, 'sell-list.json');
+    : path.join(__dirname, 'data', 'sell-list.json');
 
   if (!fs.existsSync(resolved)) {
-    logger.error(`sell-list.json not found at: ${resolved}`);
-=======
-    logger.info(`  [SIMULATE] Would call factory.createCampaign(${minimumContribution}, "${dataForSell}", "${dataDescription}", ${auctionDuration}) — skipping`);
-    return { simulated: true };
-  }
-
-  // Estimate gas
-  const gas = await factory.methods
-    .createCampaign(minimumContribution, dataForSell, dataDescription, auctionDuration)
-    .estimateGas({ from: account.address });
-
-  const receipt = await factory.methods
-    .createCampaign(minimumContribution, dataForSell, dataDescription, auctionDuration)
-    .send({
-      from: account.address,
-      gas: Math.ceil(Number(gas) * 1.2),
-    });
-
-  // The AuctionCreated event emits the new campaign address
-  const newAddress = receipt.events?.AuctionCreated?.returnValues?.campaignAddress;
-  logger.info(`  ✅ Auction created!`, {
-    tx: receipt.transactionHash,
-    newCampaign: newAddress,
-  });
-
-  return { receipt, newAddress };
-}
-
-/**
- * Batch-create auctions from a JSON config file.
- */
-async function createAuctionsFromConfig(configPath = './data/sell-list.json') {
-  const resolved = path.resolve(configPath);
-  if (!fs.existsSync(resolved)) {
-    logger.error(`Sell config not found: ${resolved}`);
-    logger.info(`Create it at ${resolved} — see data/sell-list.example.json`);
->>>>>>> fceb3ee0a64fd3207910a19e4b7d3ab9011c4c0a
-    return [];
+    logger.warn(`Sell config not found: ${resolved}`);
+    return createAutoGeneratedAuctions();
   }
 
   const items = JSON.parse(fs.readFileSync(resolved, 'utf8'));
-<<<<<<< HEAD
-  logger.info(`Batch creating ${items.length} auction(s)...`);
-=======
+  if (!Array.isArray(items) || items.length === 0) {
+    return createAutoGeneratedAuctions();
+  }
   logger.info(`Creating ${items.length} auction(s) from ${resolved}`);
->>>>>>> fceb3ee0a64fd3207910a19e4b7d3ab9011c4c0a
 
   const results = [];
   for (const item of items) {
     try {
-<<<<<<< HEAD
-      const r = await createAuction(item);
-      results.push({ item, success: true, ...r });
-    } catch (err) {
-      logger.error(`Failed: "${item.dataDescription}"`, { error: err.message });
-      results.push({ item, success: false, error: err.message });
-    }
-    await sleep(3000);
-  }
-=======
       const result = await createAuction(item);
       results.push({ item, success: true, ...result });
     } catch (err) {
-      logger.error(`Failed to create auction: ${item.dataDescription}`, { error: err.message });
+      logger.error(`Failed to create auction "${item.dataDescription}"`, { error: err.message });
       results.push({ item, success: false, error: err.message });
     }
-    await sleep(3000); // avoid nonce collisions
+    await sleep(2000);
   }
 
->>>>>>> fceb3ee0a64fd3207910a19e4b7d3ab9011c4c0a
   return results;
 }
 
-function sleep(ms) { return new Promise(r => setTimeout(r, ms)); }
+async function createAutoGeneratedAuctions(count = Number(process.env.AUTO_GENERATE_COUNT || '2')) {
+  if (process.env.AUTO_GENERATE_AUCTIONS === 'false') {
+    logger.info('Auto-generated auctions are disabled');
+    return [];
+  }
 
-module.exports = { createAuction, createAuctionsFromConfig };
+  const items = Array.from({ length: Math.max(1, count) }, (_, index) => buildGeneratedAuction(index));
+  logger.info(`Auto-generating ${items.length} auction idea(s)`);
+
+  const results = [];
+  for (const item of items) {
+    try {
+      const result = await createAuction(item);
+      results.push({ item, success: true, generated: true, ...result });
+    } catch (err) {
+      logger.error(`Failed to create generated auction "${item.dataDescription}"`, { error: err.message });
+      results.push({ item, success: false, generated: true, error: err.message });
+    }
+    await sleep(2000);
+  }
+
+  return results;
+}
+
+async function maintainAuctionInventory(auctions = []) {
+  if (process.env.ENABLE_SELLING !== 'true') {
+    return [];
+  }
+
+  const target = Math.max(0, Number(process.env.TARGET_ACTIVE_SELL_AUCTIONS || '2'));
+  const myOpenAuctions = auctions.filter((auction) => auction.isActive && auction.isManager);
+  const missing = Math.max(0, target - myOpenAuctions.length);
+
+  if (missing === 0) {
+    logger.info(`Auction inventory healthy (${myOpenAuctions.length}/${target} active listings)`);
+    return [];
+  }
+
+  logger.info(`Maintaining inventory: creating ${missing} auction(s) to reach target ${target}`);
+  return createAutoGeneratedAuctions(missing);
+}
+
+function buildGeneratedAuction(index = 0) {
+  const slot = GENERATED_CATALOG[index % GENERATED_CATALOG.length];
+  const desc = slot.descriptions[randomInt(0, slot.descriptions.length - 1)];
+  const payload = slot.payloads[randomInt(0, slot.payloads.length - 1)];
+  const minimumContribution = randomInt(slot.minBidRange[0], slot.minBidRange[1]);
+  const auctionDuration = randomInt(slot.durationRange[0], slot.durationRange[1]);
+  const stamp = new Date().toISOString().replace('T', ' ').slice(0, 16);
+
+  return {
+    minimumContribution,
+    dataForSell: `${payload} | generated-at=${stamp} | theme=${slot.theme}`,
+    dataDescription: `${desc} | ${slot.theme}`,
+    auctionDuration,
+  };
+}
+
+function randomInt(min, max) {
+  return Math.floor(Math.random() * (max - min + 1)) + min;
+}
+
+function sleep(ms) {
+  return new Promise((resolve) => setTimeout(resolve, ms));
+}
+
+module.exports = { createAuction, createAuctionsFromConfig, createAutoGeneratedAuctions, maintainAuctionInventory };

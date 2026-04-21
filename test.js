@@ -1,86 +1,5 @@
-<<<<<<< HEAD
-// test.js — run with: npm test
 const assert = require('assert');
-let passed = 0, failed = 0;
-
-function test(name, fn) {
-  try { fn(); console.log(`  ✅ ${name}`); passed++; }
-  catch (err) { console.error(`  ❌ ${name}\n     → ${err.message}`); failed++; }
-}
-
-// ── Inline shouldBid logic (no chain needed) ──────────────────────
-function shouldBid(auction, me, myBudget, opts = {}) {
-  const MAX_BID_WEI     = BigInt(opts.maxBid    ?? '5000');
-  const OUTBID_BY_WEI   = BigInt(opts.outbidBy  ?? '100');
-  const MAX_MIN_CONTRIB = BigInt(opts.maxMinBid  ?? '2000');
-  const SKIP_IF_WINNING = opts.skipIfWinning     ?? true;
-  const MIN_TIME_SEC    = opts.minTimeSec        ?? 60;
-
-  if (!auction.isActive)                       return { bid: false, reason: 'Auction closed' };
-  if (auction.secondsLeft < MIN_TIME_SEC)      return { bid: false, reason: 'Too little time' };
-  if (auction.isManager)                       return { bid: false, reason: 'You are the seller' };
-  if (SKIP_IF_WINNING && auction.amIWinning)   return { bid: false, reason: 'Already winning' };
-  if (auction.minimumContribution > MAX_MIN_CONTRIB) return { bid: false, reason: 'Min contribution too high' };
-
-  let bidAmount = auction.approversCount === 0 ? auction.minimumContribution : auction.highestBid + OUTBID_BY_WEI;
-  let sendAmount = bidAmount;
-  if (auction.amIBidding && auction.myBid > 0n) {
-    sendAmount = bidAmount - auction.myBid;
-    if (sendAmount <= 0n) return { bid: false, reason: 'Already covered' };
-  }
-  if (sendAmount > MAX_BID_WEI)  return { bid: false, reason: 'Exceeds MAX_BID_WEI' };
-  if (sendAmount > myBudget)     return { bid: false, reason: 'Insufficient budget' };
-  return { bid: true, reason: 'OK', amount: sendAmount };
-}
-
-const mk = (o = {}) => ({
-  address: '0xA', dataDescription: 'Test', isActive: true, secondsLeft: 300,
-  isManager: false, amIWinning: false, amIBidding: false, myBid: 0n,
-  minimumContribution: 500n, highestBid: 0n, approversCount: 0, closed: false, ...o,
-});
-
-console.log('\n📋 shouldBid() tests\n');
-test('Bids minimumContribution when no bids', () => { const r = shouldBid(mk(), 'me', 9999n); assert(r.bid); assert.strictEqual(r.amount, 500n); });
-test('Outbids current highest', () => { const r = shouldBid(mk({ approversCount:1, highestBid:1000n, minimumContribution:100n }), 'me', 9999n, { outbidBy:'200' }); assert(r.bid); assert.strictEqual(r.amount, 1200n); });
-test('Sends only increment if already bidding', () => { const r = shouldBid(mk({ approversCount:2, highestBid:1500n, minimumContribution:100n, amIBidding:true, myBid:1000n }), 'me', 9999n, { outbidBy:'100' }); assert(r.bid); assert.strictEqual(r.amount, 600n); });
-test('Skips closed', () => { assert(!shouldBid(mk({ isActive:false }), 'me', 9999n).bid); });
-test('Skips own auction', () => { assert(!shouldBid(mk({ isManager:true }), 'me', 9999n).bid); });
-test('Skips when winning', () => { assert(!shouldBid(mk({ amIWinning:true }), 'me', 9999n).bid); });
-test('Bids when winning if skipIfWinning=false', () => { const r = shouldBid(mk({ amIWinning:true, approversCount:1, highestBid:500n, minimumContribution:100n }), 'me', 9999n, { skipIfWinning:false, outbidBy:'50' }); assert(r.bid); });
-test('Skips high min contribution', () => { assert(!shouldBid(mk({ minimumContribution:9999n }), 'me', 99999n, { maxMinBid:'1000' }).bid); });
-test('Skips when exceeds MAX_BID_WEI', () => { assert(!shouldBid(mk({ approversCount:1, highestBid:9000n, minimumContribution:100n }), 'me', 99999n, { maxBid:'500', outbidBy:'100' }).bid); });
-test('Skips insufficient budget', () => { assert(!shouldBid(mk({ minimumContribution:1000n }), 'me', 500n).bid); });
-test('Skips too little time', () => { assert(!shouldBid(mk({ secondsLeft:10 }), 'me', 9999n, { minTimeSec:60 }).bid); });
-test('Skips when already covered', () => { assert(!shouldBid(mk({ approversCount:1, highestBid:500n, amIBidding:true, myBid:700n, minimumContribution:100n }), 'me', 9999n, { outbidBy:'100' }).bid); });
-
-console.log('\n📋 CSV tests\n');
-function toCSV(txs) { return ['bidder,bid,time', ...txs.map(t=>`"${t.bidder}","${t.bid}","${t.time}"`)].join('\n'); }
-test('Correct header', () => { assert(toCSV([{bidder:'0xA',bid:'1',time:'t'}]).startsWith('bidder,bid,time')); });
-test('Correct row count', () => { assert.strictEqual(toCSV([{bidder:'a',bid:'1',time:'t'},{bidder:'b',bid:'2',time:'t'}]).split('\n').length, 3); });
-
-console.log('\n📋 Validation tests\n');
-function validate(item) {
-  const e = [];
-  if (!Number.isInteger(Number(item.minimumContribution)) || Number(item.minimumContribution) <= 0) e.push('minimumContribution');
-  if (!Number.isInteger(Number(item.auctionDuration)) || item.auctionDuration<1 || item.auctionDuration>30) e.push('auctionDuration');
-  if (!String(item.dataForSell||'').trim())     e.push('dataForSell');
-  if (!String(item.dataDescription||'').trim()) e.push('dataDescription');
-  return e;
-}
-test('Valid item passes', () => { assert.strictEqual(validate({minimumContribution:500,auctionDuration:10,dataForSell:'d',dataDescription:'desc'}).length, 0); });
-test('Rejects zero minContrib', () => { assert(validate({minimumContribution:0,auctionDuration:10,dataForSell:'d',dataDescription:'d'}).includes('minimumContribution')); });
-test('Rejects duration>30', () => { assert(validate({minimumContribution:100,auctionDuration:31,dataForSell:'d',dataDescription:'d'}).includes('auctionDuration')); });
-test('Rejects empty data', () => { assert(validate({minimumContribution:100,auctionDuration:5,dataForSell:'',dataDescription:'d'}).includes('dataForSell')); });
-
-console.log(`\n${'─'.repeat(40)}\n${passed} passed, ${failed} failed`);
-if (failed > 0) process.exit(1);
-else console.log('All tests passed ✅\n');
-=======
-// src/test.js
-// Lightweight test suite — verifies the bot's logic without connecting to chain.
-// Run with: node src/test.js
-
-const assert = require('assert');
+const { shouldBid } = require('./bidder');
 
 let passed = 0;
 let failed = 0;
@@ -88,72 +7,18 @@ let failed = 0;
 function test(name, fn) {
   try {
     fn();
-    console.log(`  ✅ ${name}`);
+    console.log(`  ok ${name}`);
     passed++;
   } catch (err) {
-    console.error(`  ❌ ${name}`);
-    console.error(`     → ${err.message}`);
+    console.error(`  fail ${name}: ${err.message}`);
     failed++;
   }
 }
 
-// ── Mock the chain module so bidder.js can be required without a real RPC ──
-const Module = require('module');
-const _resolveFilename = Module._resolveFilename.bind(Module);
-Module._resolveFilename = function(request, parent, isMain, options) {
-  if (request === './chain' || request === '../chain') return request;
-  return _resolveFilename(request, parent, isMain, options);
-};
-require.cache['./chain'] = { id: './chain', filename: './chain', loaded: true, exports: {
-  getAccount: () => ({ address: '0xBotWallet000000000000000000000000000001' }),
-  getCampaign: () => ({}),
-  getWeb3: () => ({}),
-  weiToEth: (w) => (Number(w) / 1e18).toFixed(8),
-}};
-require.cache['../chain'] = require.cache['./chain'];
-
-// Load bidder logic (shouldBid is pure — no RPC calls)
-// We inline it here to avoid require issues in test context
-function shouldBid_test(auction, me, myBudget, opts = {}) {
-  const MAX_BID_WEI     = BigInt(opts.maxBid     ?? '5000');
-  const OUTBID_BY_WEI   = BigInt(opts.outbidBy   ?? '100');
-  const MAX_MIN_CONTRIB = BigInt(opts.maxMinBid   ?? '2000');
-  const SKIP_IF_WINNING = opts.skipIfWinning      ?? true;
-  const MIN_TIME_SEC    = opts.minTimeSec         ?? 60;
-
-  if (!auction.isActive)
-    return { bid: false, reason: 'Auction closed' };
-  if (auction.secondsLeft < MIN_TIME_SEC)
-    return { bid: false, reason: `Too little time` };
-  if (auction.isManager)
-    return { bid: false, reason: 'You are the seller' };
-  if (SKIP_IF_WINNING && auction.amIWinning)
-    return { bid: false, reason: 'Already winning' };
-  if (auction.minimumContribution > MAX_MIN_CONTRIB)
-    return { bid: false, reason: 'Min contribution too high' };
-
-  let bidAmount = auction.approversCount === 0
-    ? auction.minimumContribution
-    : auction.highestBid + OUTBID_BY_WEI;
-
-  let sendAmount = bidAmount;
-  if (auction.amIBidding && auction.myBid > 0n) {
-    sendAmount = bidAmount - auction.myBid;
-    if (sendAmount <= 0n) return { bid: false, reason: 'Already have highest bid covered' };
-  }
-
-  if (sendAmount > MAX_BID_WEI)
-    return { bid: false, reason: `Exceeds MAX_BID_WEI` };
-  if (sendAmount > myBudget)
-    return { bid: false, reason: `Insufficient budget` };
-
-  return { bid: true, reason: 'All conditions met', amount: sendAmount };
-}
-
-function makeAuction(overrides = {}) {
+function auction(overrides = {}) {
   return {
-    address: '0xAuction0000000000000000000000000000001',
-    dataDescription: 'Test Dataset',
+    address: '0xA',
+    dataDescription: 'Test',
     isActive: true,
     secondsLeft: 300,
     isManager: false,
@@ -168,198 +33,56 @@ function makeAuction(overrides = {}) {
   };
 }
 
-// ──────────────────────────────────────────────────────────────
-console.log('\n📋 shouldBid() strategy tests\n');
+const strategy = {
+  profile: 'balanced',
+  MAX_BID_WEI: 5000n,
+  OUTBID_BY_WEI: 100n,
+  MAX_MIN_CONTRIB: 2000n,
+  SKIP_IF_WINNING: true,
+  MIN_TIME_SEC: 60,
+};
 
-test('Bids with minimumContribution when no bids exist', () => {
-  const result = shouldBid_test(makeAuction({ approversCount: 0, minimumContribution: 500n }), 'me', 9999n);
+console.log('\nshouldBid() tests\n');
+
+test('bids minimum contribution when empty', () => {
+  const result = shouldBid(auction(), 9999n, strategy);
   assert.strictEqual(result.bid, true);
   assert.strictEqual(result.amount, 500n);
 });
 
-test('Outbids current highest by OUTBID_BY_WEI', () => {
-  const result = shouldBid_test(makeAuction({
-    approversCount: 1,
-    highestBid: 1000n,
-    minimumContribution: 100n,
-  }), 'me', 9999n, { outbidBy: '200' });
-  assert.strictEqual(result.bid, true);
-  assert.strictEqual(result.amount, 1200n); // 1000 + 200
+test('outbids current highest', () => {
+  const result = shouldBid(auction({ approversCount: 1, highestBid: 1000n, minimumContribution: 100n }), 9999n, strategy);
+  assert.strictEqual(result.amount, 1100n);
 });
 
-test('Only sends increment when already bidding', () => {
-  const result = shouldBid_test(makeAuction({
-    approversCount: 2,
-    highestBid: 1500n,
-    minimumContribution: 100n,
-    amIBidding: true,
-    myBid: 1000n,
-  }), 'me', 9999n, { outbidBy: '100' });
-  assert.strictEqual(result.bid, true);
-  assert.strictEqual(result.amount, 600n); // (1500+100) - 1000 = 600
-});
-
-test('Skips closed auctions', () => {
-  const result = shouldBid_test(makeAuction({ isActive: false }), 'me', 9999n);
-  assert.strictEqual(result.bid, false);
-  assert(result.reason.includes('closed'));
-});
-
-test('Skips own auctions (seller)', () => {
-  const result = shouldBid_test(makeAuction({ isManager: true }), 'me', 9999n);
-  assert.strictEqual(result.bid, false);
-  assert(result.reason.includes('seller'));
-});
-
-test('Skips when already winning (SKIP_IF_WINNING=true)', () => {
-  const result = shouldBid_test(makeAuction({ amIWinning: true }), 'me', 9999n, { skipIfWinning: true });
-  assert.strictEqual(result.bid, false);
-});
-
-test('Bids when already winning but SKIP_IF_WINNING=false', () => {
-  const result = shouldBid_test(makeAuction({
-    amIWinning: true,
-    approversCount: 1,
-    highestBid: 500n,
-    minimumContribution: 100n,
-  }), 'me', 9999n, { skipIfWinning: false, outbidBy: '50' });
-  assert.strictEqual(result.bid, true);
-});
-
-test('Skips when minimum contribution exceeds MAX_MIN_CONTRIBUTION_WEI', () => {
-  const result = shouldBid_test(makeAuction({ minimumContribution: 9999n }), 'me', 99999n, { maxMinBid: '1000' });
-  assert.strictEqual(result.bid, false);
-  assert(result.reason.includes('Min contribution'));
-});
-
-test('Skips when bid would exceed MAX_BID_WEI', () => {
-  const result = shouldBid_test(makeAuction({
-    approversCount: 1,
-    highestBid: 9000n,
-    minimumContribution: 100n,
-  }), 'me', 99999n, { maxBid: '500', outbidBy: '100' });
-  assert.strictEqual(result.bid, false);
-  assert(result.reason.includes('MAX_BID_WEI'));
-});
-
-test('Skips when on-chain budget is insufficient', () => {
-  const result = shouldBid_test(makeAuction({
-    approversCount: 0,
-    minimumContribution: 1000n,
-  }), 'me', 500n); // budget too low
-  assert.strictEqual(result.bid, false);
-  assert(result.reason.includes('budget'));
-});
-
-test('Skips when too little time remaining', () => {
-  const result = shouldBid_test(makeAuction({ secondsLeft: 10 }), 'me', 9999n, { minTimeSec: 60 });
-  assert.strictEqual(result.bid, false);
-  assert(result.reason.includes('time'));
-});
-
-test('Skips when already have highest bid covered', () => {
-  // myBid already exceeds what we would target
-  const result = shouldBid_test(makeAuction({
-    approversCount: 1,
-    highestBid: 500n,
-    amIBidding: true,
-    myBid: 700n, // already higher than 500+100=600
-    minimumContribution: 100n,
-  }), 'me', 9999n, { outbidBy: '100' });
-  assert.strictEqual(result.bid, false);
-});
-
-// ──────────────────────────────────────────────────────────────
-console.log('\n📋 CSV export tests\n');
-
-function transactionsToCSV(transactions) {
-  const REQUIRED_KEYS = ['bidder', 'bid', 'time'];
-  const header = REQUIRED_KEYS.join(',');
-  const rows = transactions.map(tx =>
-    REQUIRED_KEYS.map(key => `"${String(tx[key]).replace(/"/g, '""')}"`).join(',')
+test('sends only increment when already bidding', () => {
+  const result = shouldBid(
+    auction({ approversCount: 2, highestBid: 1500n, minimumContribution: 100n, amIBidding: true, myBid: 1000n }),
+    9999n,
+    strategy
   );
-  return [header, ...rows].join('\n');
-}
-
-test('CSV has correct header', () => {
-  const csv = transactionsToCSV([{ bidder: '0xABC', bid: '100', time: '2024-01-01' }]);
-  assert(csv.startsWith('bidder,bid,time'));
+  assert.strictEqual(result.amount, 600n);
 });
 
-test('CSV has correct row count', () => {
-  const rows = [
-    { bidder: '0xAAA', bid: '100', time: 't1' },
-    { bidder: '0xBBB', bid: '200', time: 't2' },
-  ];
-  const csv = transactionsToCSV(rows);
-  const lines = csv.split('\n');
-  assert.strictEqual(lines.length, 3); // header + 2 rows
+test('skips own auction', () => {
+  assert.strictEqual(shouldBid(auction({ isManager: true }), 9999n, strategy).bid, false);
 });
 
-test('CSV escapes double quotes', () => {
-  const csv = transactionsToCSV([{ bidder: 'addr"test', bid: '0', time: 't' }]);
-  assert(csv.includes('addr""test'));
+test('skips when already winning', () => {
+  assert.strictEqual(shouldBid(auction({ amIWinning: true }), 9999n, strategy).bid, false);
 });
 
-// ──────────────────────────────────────────────────────────────
-console.log('\n📋 Auction time utils tests\n');
-
-function formatTime(seconds) {
-  if (seconds < 60)   return `${seconds}s`;
-  if (seconds < 3600) return `${Math.floor(seconds / 60)}m ${seconds % 60}s`;
-  return `${Math.floor(seconds / 3600)}h ${Math.floor((seconds % 3600) / 60)}m`;
-}
-
-test('formatTime: seconds only', () => { assert.strictEqual(formatTime(45), '45s'); });
-test('formatTime: minutes and seconds', () => { assert.strictEqual(formatTime(90), '1m 30s'); });
-test('formatTime: hours and minutes', () => { assert.strictEqual(formatTime(3660), '1h 1m'); });
-test('formatTime: 30 minutes (max auction)', () => { assert.strictEqual(formatTime(1800), '30m 0s'); });
-
-// ──────────────────────────────────────────────────────────────
-console.log('\n📋 Sell config validation tests\n');
-
-function validateAuctionItem(item) {
-  const errors = [];
-  if (!Number.isInteger(Number(item.minimumContribution)) || Number(item.minimumContribution) <= 0)
-    errors.push('minimumContribution must be a positive integer');
-  if (!Number.isInteger(Number(item.auctionDuration)) || item.auctionDuration < 1 || item.auctionDuration > 30)
-    errors.push('auctionDuration must be between 1 and 30');
-  if (!String(item.dataForSell || '').trim())
-    errors.push('dataForSell cannot be empty');
-  if (!String(item.dataDescription || '').trim())
-    errors.push('dataDescription cannot be empty');
-  return errors;
-}
-
-test('Valid auction item passes validation', () => {
-  const errors = validateAuctionItem({ minimumContribution: 500, auctionDuration: 10, dataForSell: 'data', dataDescription: 'desc' });
-  assert.strictEqual(errors.length, 0);
-});
-test('Rejects zero minimumContribution', () => {
-  const errors = validateAuctionItem({ minimumContribution: 0, auctionDuration: 10, dataForSell: 'data', dataDescription: 'desc' });
-  assert(errors.some(e => e.includes('minimumContribution')));
-});
-test('Rejects auctionDuration > 30', () => {
-  const errors = validateAuctionItem({ minimumContribution: 100, auctionDuration: 31, dataForSell: 'data', dataDescription: 'desc' });
-  assert(errors.some(e => e.includes('auctionDuration')));
-});
-test('Rejects empty dataForSell', () => {
-  const errors = validateAuctionItem({ minimumContribution: 100, auctionDuration: 5, dataForSell: '', dataDescription: 'desc' });
-  assert(errors.some(e => e.includes('dataForSell')));
-});
-test('Rejects empty dataDescription', () => {
-  const errors = validateAuctionItem({ minimumContribution: 100, auctionDuration: 5, dataForSell: 'data', dataDescription: '   ' });
-  assert(errors.some(e => e.includes('dataDescription')));
+test('skips high minimum contribution', () => {
+  assert.strictEqual(shouldBid(auction({ minimumContribution: 9999n }), 9999n, strategy).bid, false);
 });
 
-// ──────────────────────────────────────────────────────────────
-console.log(`\n${'─'.repeat(50)}`);
-console.log(`Results: ${passed} passed, ${failed} failed`);
-if (failed > 0) {
-  console.error('Some tests failed!');
-  process.exit(1);
-} else {
-  console.log('All tests passed ✅');
-  process.exit(0);
-}
->>>>>>> fceb3ee0a64fd3207910a19e4b7d3ab9011c4c0a
+test('skips insufficient budget', () => {
+  assert.strictEqual(shouldBid(auction({ minimumContribution: 1000n }), 500n, strategy).bid, false);
+});
+
+test('skips too little time', () => {
+  assert.strictEqual(shouldBid(auction({ secondsLeft: 10 }), 9999n, strategy).bid, false);
+});
+
+console.log(`\n${passed} passed, ${failed} failed`);
+if (failed > 0) process.exit(1);

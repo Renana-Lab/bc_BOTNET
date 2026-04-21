@@ -1,126 +1,60 @@
-<<<<<<< HEAD
-// autotrader.js — cron-based trading loop
-const cron = require('node-cron');
-const logger = require('./logger');
-const { fetchAllAuctions, printAuctions } = require('./auctions');
-const { bidOnEligibleAuctions, finalizeAuction } = require('./bidder');
-const { createAuctionsFromConfig } = require('./seller');
-const { weiToEth, unwrapError } = require('./chain');
-const { fetchMyBudget } = require('./auctions');
-
-const stats = { runs: 0, bids: 0, finalized: 0, created: 0, errors: 0 };
-let isRunning = false;
-
-async function runCycle() {
-  if (isRunning) { logger.warn('Cycle already running — skipping'); return; }
-  isRunning = true;
-  stats.runs++;
-  logger.info(`\n⚡ Cycle #${stats.runs} — ${new Date().toISOString()}`);
-
-  try {
-    const auctions  = await fetchAllAuctions();
-    printAuctions(auctions);
-
-    const myBudget  = await fetchMyBudget();
-    logger.info(`Budget: ${myBudget} wei (${weiToEth(myBudget)} ETH)`);
-
-    // Finalize ended auctions where we are manager
-    for (const a of auctions.filter(a => !a.isActive && !a.closed && a.isManager && a.approversCount > 0)) {
-      try { await finalizeAuction(a.address); stats.finalized++; }
-      catch (_) { stats.errors++; }
-    }
-
-    // Auto-create if no open auctions
-    if (process.env.AUTO_CREATE_AUCTIONS === 'true' && auctions.filter(a => a.isActive).length === 0) {
-      logger.info('No open auctions — auto-creating from sell-list.json...');
-      const created = await createAuctionsFromConfig();
-      stats.created += created.filter(r => r.success).length;
-    }
-
-    // Bid on open auctions
-    const open = auctions.filter(a => a.isActive);
-    if (open.length > 0) {
-      const results = await bidOnEligibleAuctions(open);
-      stats.bids   += results.filter(r => r.success && !r.simulated).length;
-      stats.errors += results.filter(r => !r.success).length;
-    }
-
-    logger.info('📊 Stats', stats);
-  } catch (err) {
-    logger.error('Cycle error', { error: unwrapError(err) });
-=======
-// src/autotrader.js
-// Runs buy + sell + finalize on a cron schedule.
-// This is the "set it and forget it" mode.
-
 const cron = require('node-cron');
 const logger = require('./logger');
 const { fetchAllAuctions, fetchMyBudget, printAuctions } = require('./auctions');
 const { bidOnEligibleAuctions, finalizeAuction } = require('./bidder');
-const { createAuctionsFromConfig } = require('./seller');
-const { getAccount, weiToEth } = require('./chain');
+const { maintainAuctionInventory } = require('./seller');
+const { startListening } = require('./listener');
+const { weiToEth, unwrapError } = require('./chain');
 
-const stats = { runs: 0, bids: 0, finalizations: 0, auctionsCreated: 0, errors: 0 };
+const stats = { runs: 0, bids: 0, finalized: 0, created: 0, errors: 0 };
 let isRunning = false;
+let listenerReady = false;
+let liveTriggerTimer = null;
 
 async function runCycle() {
   if (isRunning) {
-    logger.warn('AutoTrader: previous cycle still running — skipping overlap');
+    logger.warn('Cycle already running - skipping overlap');
     return;
   }
+
   isRunning = true;
   stats.runs++;
-
-  logger.info(`\n⚡ AutoTrader cycle #${stats.runs} — ${new Date().toISOString()}`);
+  logger.info(`Cycle #${stats.runs} - ${new Date().toISOString()}`);
 
   try {
-    // ── 1. Fetch market state ──────────────────────────────────
     const auctions = await fetchAllAuctions();
     printAuctions(auctions);
 
     const myBudget = await fetchMyBudget();
     logger.info(`Budget: ${myBudget} wei (${weiToEth(myBudget)} ETH)`);
 
-    // ── 2. Finalize ended auctions where I'm the manager ───────
-    const toFinalize = auctions.filter(a =>
-      !a.isActive && !a.closed && a.isManager && a.approversCount > 0
-    );
-    for (const a of toFinalize) {
-      logger.info(`Finalizing "${a.dataDescription}" — collecting ${a.highestBid} wei`);
-      try {
-        await finalizeAuction(a.address);
-        stats.finalizations++;
-      } catch (err) {
-        logger.error('Finalize failed', { address: a.address, error: err.message });
-        stats.errors++;
+    if (process.env.ENABLE_FINALIZE !== 'false') {
+      for (const auction of auctions.filter((a) => !a.isActive && !a.closed && a.isManager && a.approversCount > 0)) {
+        try {
+          const result = await finalizeAuction(auction.address);
+          if (!result?.skipped) stats.finalized++;
+        } catch (err) {
+          logger.error(`Finalize failed for ${auction.address}`, { error: err.message });
+          stats.errors++;
+        }
       }
     }
 
-    // ── 3. Bid on eligible open auctions ──────────────────────
-    const openAuctions = auctions.filter(a => a.isActive);
-    if (openAuctions.length > 0) {
-      const bidResults = await bidOnEligibleAuctions(openAuctions);
-      stats.bids += bidResults.filter(r => r.success).length;
-      stats.errors += bidResults.filter(r => !r.success).length;
+    if (process.env.ENABLE_SELLING === 'true') {
+      const created = await maintainAuctionInventory(auctions);
+      stats.created += created.filter((r) => r.success).length;
+      stats.errors += created.filter((r) => !r.success).length;
     }
 
-    // ── 4. Create new auctions from sell-list.json ─────────────
-    //    (only if the file exists and has items — won't re-create existing ones)
-    const fs = require('fs');
-    if (fs.existsSync('./data/sell-list.json')) {
-      const items = JSON.parse(fs.readFileSync('./data/sell-list.json', 'utf8'));
-      // Only create if file has items (guard against empty runs)
-      if (items.length > 0 && process.env.AUTO_CREATE_AUCTIONS === 'true') {
-        logger.info('Creating auctions from sell-list.json...');
-        const created = await createAuctionsFromConfig('./data/sell-list.json');
-        stats.auctionsCreated += created.filter(r => r.success).length;
-      }
+    if (process.env.ENABLE_BIDDING !== 'false') {
+      const results = await bidOnEligibleAuctions(auctions.filter((a) => a.isActive));
+      stats.bids += results.filter((r) => r.success && !r.simulated).length;
+      stats.errors += results.filter((r) => !r.success).length;
     }
 
-    printStats();
+    logger.info('Session stats', stats);
   } catch (err) {
-    logger.error('AutoTrader cycle error', { error: err.message, stack: err.stack });
->>>>>>> fceb3ee0a64fd3207910a19e4b7d3ab9011c4c0a
+    logger.error('Cycle error', { error: unwrapError(err) });
     stats.errors++;
   } finally {
     isRunning = false;
@@ -129,28 +63,29 @@ async function runCycle() {
 
 function startCron() {
   const schedule = process.env.AUTO_TRADE_CRON || '*/2 * * * *';
-<<<<<<< HEAD
-  if (!cron.validate(schedule)) { logger.error(`Invalid cron: ${schedule}`); process.exit(1); }
-  logger.info(`⏰ AutoTrader cron: "${schedule}" — Ctrl+C to stop`);
+  if (!cron.validate(schedule)) {
+    throw new Error(`Invalid cron schedule: ${schedule}`);
+  }
+
+  logger.info(`AutoTrader cron: "${schedule}"`);
+  ensureListener();
   runCycle();
   cron.schedule(schedule, runCycle);
 }
 
-module.exports = { runCycle, startCron };
-=======
-  if (!cron.validate(schedule)) {
-    logger.error(`Invalid cron schedule: "${schedule}"`);
-    process.exit(1);
+async function ensureListener() {
+  if (listenerReady) return;
+  listenerReady = true;
+  try {
+    await startListening(() => {
+      clearTimeout(liveTriggerTimer);
+      liveTriggerTimer = setTimeout(() => {
+        runCycle().catch((err) => logger.error('Live-triggered cycle failed', { error: unwrapError(err) }));
+      }, 1500);
+    });
+  } catch (err) {
+    logger.warn('Live listener could not start', { error: err.message });
   }
-  logger.info(`⏰ AutoTrader started — cron: "${schedule}"`);
-  logger.info('Press Ctrl+C to stop.\n');
-  runCycle(); // run immediately on start
-  cron.schedule(schedule, runCycle);
 }
 
-function printStats() {
-  logger.info('📊 Session stats', stats);
-}
-
-module.exports = { startCron, runCycle };
->>>>>>> fceb3ee0a64fd3207910a19e4b7d3ab9011c4c0a
+module.exports = { runCycle, startCron };

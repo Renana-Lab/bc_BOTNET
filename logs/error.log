@@ -120,3 +120,234 @@
 {"level":"error","message":"sell-list.json not found at: C:\\Users\\Programmers\\Desktop\\bc_SUPERBOT\\files\\sell-list.json","timestamp":"2026-04-20 15:10:59"}
 {"level":"error","message":"sell-list.json not found at: C:\\Users\\Programmers\\Desktop\\bc_SUPERBOT\\files\\sell-list.json","timestamp":"2026-04-20 15:11:00"}
 {"level":"error","message":"sell-list.json not found at: C:\\Users\\Programmers\\Desktop\\bc_SUPERBOT\\files\\sell-list.json","timestamp":"2026-04-20 15:12:00"}
+{"error":"Returned error: ","level":"error","message":"Failed to fetch budget","timestamp":"2026-04-21 10:40:00"}
+{"error":"Returned error:","level":"error","message":"Admin API error","timestamp":"2026-04-21 10:40:40"}
+{"error":"Cannot connect to Ethereum RPC: Returned error: ","level":"error","message":"Fatal error","stack":"Error: Cannot connect to Ethereum RPC: Returned error: \n    at Object.init (C:\\Users\\Programmers\\Desktop\\bc_SUPERBOT\\files\\chain.js:43:11)\n    at process.processTicksAndRejections (node:internal/process/task_queues:105:5)\n    at async main (C:\\Users\\Programmers\\Desktop\\bc_SUPERBOT\\files\\index.js:15:3)","timestamp":"2026-04-21 10:41:55"}
+{"error":"Returned error:","level":"error","message":"Admin API error","timestamp":"2026-04-21 10:43:49"}
+{"error":"Returned error:","level":"error","message":"Admin API error","timestamp":"2026-04-21 10:44:04"}
+{"error":"Returned error: ","level":"error","message":"Failed to fetch deployed campaigns","timestamp":"2026-04-21 10:44:04"}
+{"error":"Returned error:","level":"error","message":"Admin API error","timestamp":"2026-04-21 10:44:20"}
+{"error":"Returned error: ","level":"error","message":"Failed to fetch deployed campaigns","timestamp":"2026-04-21 10:44:24"}
+{"error":"Returned error:","level":"error","message":"Admin API error","timestamp":"2026-04-21 10:44:34"}
+{"error":"Returned error: ","level":"error","message":"Failed to fetch deployed campaigns","timestamp":"2026-04-21 10:44:51"}
+{"error":"Returned error: ","level":"error","message":"Failed to fetch deployed campaigns","timestamp":"2026-04-21 10:44:59"}
+{"error":"Returned error:","level":"error","message":"Admin API error","timestamp":"2026-04-21 10:45:10"}
+{"error":"Returned error: ","level":"error","message":"Failed to fetch deployed campaigns","timestamp":"2026-04-21 10:45:14"}
+{"error":"Returned error:","level":"error","message":"Admin API error","timestamp":"2026-04-21 10:45:19"}
+{"error":"Returned error: ","level":"error","message":"Failed to fetch deployed campaigns","timestamp":"2026-04-21 10:45:22"}
+{"error":"Returned error:","level":"error","message":"Admin API error","timestamp":"2026-04-21 10:45:22"}
+{"error":"Returned error: ","level":"error","message":"Failed to create auction \"Financial time-series dataset Q1 2024 — 500 equities, hourly OHLCV\"","timestamp":"2026-04-21 10:45:22"}
+{"error":"Returned error:","level":"error","message":"Admin API error","timestamp":"2026-04-21 10:45:24"}
+{"error":"Returned error:","level":"error","message":"Failed to create auction \"Real-time weather sensor data — 1000 IoT sensors across EU\"","timestamp":"2026-04-21 10:45:25"}
+{"error":"Returned error:","level":"error","message":"Admin API error","timestamp":"2026-04-21 10:45:39"}
+{"error":"Returned error:","level":"error","message":"Admin API error","timestamp":"2026-04-21 10:45:59"}
+{"error":"Returned error:","level":"error","message":"Failed to create auction \"Financial time-series dataset Q1 2024 — 500 equities, hourly OHLCV\"","timestamp":"2026-04-21 10:46:05"}
+{"error":"Returned error: ","level":"error","message":"Failed to fetch deployed campaigns","timestamp":"2026-04-21 10:46:05"}
+{"error":"Returned error: ","level":"error","message":"Failed to create auction \"Real-time weather sensor data — 1000 IoT sensors across EU\"","timestamp":"2026-04-21 10:46:08"}
+{"error":"Returned error: ","level":"error","message":"Failed to fetch deployed campaigns","timestamp":"2026-04-21 10:46:20"}
+{"error":"Returned error:","level":"error","message":"Admin API error","timestamp":"2026-04-21 10:46:35"}
+{"error":"Returned error:","level":"error","message":"Admin API error","timestamp":"2026-04-21 10:46:46"}
+{"error":"Returned error: ","level":"error","message":"Failed to fetch deployed campaigns","timestamp":"2026-04-21 10:46:50"}
+{"error":"Returned error:","level":"error","message":"Admin API error","timestamp":"2026-04-21 10:47:00"}
+{"error":"Returned error:","level":"error","message":"Failed to create auction \"Financial time-series dataset Q1 2024 — 500 equities, hourly OHLCV\"","timestamp":"2026-04-21 10:50:42"}
+{"error":"Returned error:","level":"error","message":"Failed to create auction \"Financial time-series dataset Q1 2024 — 500 equities, hourly OHLCV\"","timestamp":"2026-04-21 10:50:44"}
+{"error":"Returned error: ","level":"error","message":"Failed to create auction \"Real-time weather sensor data — 1000 IoT sensors across EU\"","timestamp":"2026-04-21 10:50:44"}
+{"error":"Returned error:","level":"error","message":"Admin API error","timestamp":"2026-04-21 10:50:45"}
+{"error":"Returned error:","level":"error","message":"Failed to create auction \"Real-time weather sensor data — 1000 IoT sensors across EU\"","timestamp":"2026-04-21 10:50:48"}
+{"error":"Returned error:","level":"error","message":"Admin API error","timestamp":"2026-04-21 10:51:04"}
+{"error":"Returned error:","level":"error","message":"Admin API error","timestamp":"2026-04-21 10:51:10"}
+{"error":"Returned error:","level":"error","message":"Admin API error","timestamp":"2026-04-21 10:51:15"}
+{"error":"Returned error: ","level":"error","message":"Failed to fetch deployed campaigns","timestamp":"2026-04-21 10:51:20"}
+{"error":"Returned error:","level":"error","message":"Admin API error","timestamp":"2026-04-21 10:51:25"}
+{"error":"Returned error:","level":"error","message":"Admin API error","timestamp":"2026-04-21 10:51:30"}
+{"error":"Returned error:","level":"error","message":"Admin API error","timestamp":"2026-04-21 10:51:35"}
+{"error":"Returned error:","level":"error","message":"Admin API error","timestamp":"2026-04-21 10:51:40"}
+{"error":"Returned error:","level":"error","message":"Admin API error","timestamp":"2026-04-21 10:51:48"}
+{"error":"Returned error: ","level":"error","message":"Failed to fetch deployed campaigns","timestamp":"2026-04-21 10:51:48"}
+{"error":"Returned error:","level":"error","message":"Admin API error","timestamp":"2026-04-21 10:51:48"}
+{"error":"Returned error: ","level":"error","message":"Failed to fetch deployed campaigns","timestamp":"2026-04-21 10:51:50"}
+{"error":"Returned error: ","level":"error","message":"Failed to fetch deployed campaigns","timestamp":"2026-04-21 10:51:54"}
+{"error":"Returned error:","level":"error","message":"Admin API error","timestamp":"2026-04-21 10:51:55"}
+{"error":"Returned error: ","level":"error","message":"Failed to fetch deployed campaigns","timestamp":"2026-04-21 10:51:58"}
+{"error":"Returned error:","level":"error","message":"Admin API error","timestamp":"2026-04-21 10:51:59"}
+{"error":"Returned error: ","level":"error","message":"Failed to fetch deployed campaigns","timestamp":"2026-04-21 10:52:00"}
+{"error":"Returned error: ","level":"error","message":"Failed to create auction \"Financial time-series dataset Q1 2024 — 500 equities, hourly OHLCV\"","timestamp":"2026-04-21 10:52:00"}
+{"error":"Returned error:","level":"error","message":"Admin API error","timestamp":"2026-04-21 10:52:00"}
+{"error":"Returned error:","level":"error","message":"Admin API error","timestamp":"2026-04-21 10:52:03"}
+{"error":"Returned error: ","level":"error","message":"Failed to create auction \"Real-time weather sensor data — 1000 IoT sensors across EU\"","timestamp":"2026-04-21 10:52:03"}
+{"error":"Returned error:","level":"error","message":"Admin API error","timestamp":"2026-04-21 10:52:09"}
+{"error":"Returned error:","level":"error","message":"Admin API error","timestamp":"2026-04-21 10:52:10"}
+{"error":"Returned error:","level":"error","message":"Admin API error","timestamp":"2026-04-21 10:52:10"}
+{"error":"Returned error:","level":"error","message":"Admin API error","timestamp":"2026-04-21 10:52:10"}
+{"error":"Returned error: ","level":"error","message":"Failed to fetch deployed campaigns","timestamp":"2026-04-21 10:52:23"}
+{"error":"Returned error:","level":"error","message":"Admin API error","timestamp":"2026-04-21 10:52:23"}
+{"error":"Returned error:","level":"error","message":"Admin API error","timestamp":"2026-04-21 10:52:28"}
+{"error":"Returned error:","level":"error","message":"Admin API error","timestamp":"2026-04-21 10:52:28"}
+{"error":"Returned error:","level":"error","message":"Admin API error","timestamp":"2026-04-21 10:52:33"}
+{"error":"Returned error:","level":"error","message":"Admin API error","timestamp":"2026-04-21 10:52:33"}
+{"error":"Returned error:","level":"error","message":"Admin API error","timestamp":"2026-04-21 10:52:33"}
+{"error":"Returned error:","level":"error","message":"Admin API error","timestamp":"2026-04-21 10:52:34"}
+{"error":"Returned error:","level":"error","message":"Admin API error","timestamp":"2026-04-21 10:52:38"}
+{"error":"Returned error:","level":"error","message":"Admin API error","timestamp":"2026-04-21 10:52:44"}
+{"error":"Returned error:","level":"error","message":"Admin API error","timestamp":"2026-04-21 10:52:49"}
+{"error":"Returned error:","level":"error","message":"Admin API error","timestamp":"2026-04-21 10:52:49"}
+{"error":"Returned error:","level":"error","message":"Admin API error","timestamp":"2026-04-21 10:52:50"}
+{"error":"Returned error:","level":"error","message":"Admin API error","timestamp":"2026-04-21 10:52:54"}
+{"error":"Returned error: ","level":"error","message":"Failed to fetch deployed campaigns","timestamp":"2026-04-21 10:52:59"}
+{"error":"Returned error:","level":"error","message":"Admin API error","timestamp":"2026-04-21 10:53:04"}
+{"error":"Returned error:","level":"error","message":"Admin API error","timestamp":"2026-04-21 10:53:09"}
+{"error":"Returned error:","level":"error","message":"Admin API error","timestamp":"2026-04-21 10:53:14"}
+{"error":"Returned error:","level":"error","message":"Admin API error","timestamp":"2026-04-21 10:53:24"}
+{"error":"Returned error: ","level":"error","message":"Failed to fetch deployed campaigns","timestamp":"2026-04-21 10:53:34"}
+{"error":"Returned error: ","level":"error","message":"Failed to fetch deployed campaigns","timestamp":"2026-04-21 10:53:39"}
+{"error":"Returned error: ","level":"error","message":"Failed to fetch deployed campaigns","timestamp":"2026-04-21 10:53:40"}
+{"error":"Returned error:","level":"error","message":"Admin API error","timestamp":"2026-04-21 10:53:40"}
+{"error":"Returned error:","level":"error","message":"Admin API error","timestamp":"2026-04-21 10:53:44"}
+{"error":"Returned error:","level":"error","message":"Admin API error","timestamp":"2026-04-21 10:53:59"}
+{"error":"Returned error: ","level":"error","message":"Failed to fetch deployed campaigns","timestamp":"2026-04-21 10:54:00"}
+{"error":"Returned error: ","level":"error","message":"Failed to fetch deployed campaigns","timestamp":"2026-04-21 10:55:56"}
+{"error":"Returned error: ","level":"error","message":"Failed to fetch deployed campaigns","timestamp":"2026-04-21 10:56:48"}
+{"error":"Returned error: ","level":"error","message":"Failed to fetch deployed campaigns","timestamp":"2026-04-21 10:56:52"}
+{"error":"Returned error: ","level":"error","message":"Failed to fetch deployed campaigns","timestamp":"2026-04-21 10:57:21"}
+{"error":"Returned error: ","level":"error","message":"Failed to fetch deployed campaigns","timestamp":"2026-04-21 10:57:42"}
+{"error":"Returned error: ","level":"error","message":"Failed to fetch deployed campaigns","timestamp":"2026-04-21 10:57:45"}
+{"error":"Returned error: ","level":"error","message":"Failed to fetch deployed campaigns","timestamp":"2026-04-21 11:02:05"}
+{"error":"Returned error: ","level":"error","message":"Failed to fetch deployed campaigns","timestamp":"2026-04-21 11:02:29"}
+{"error":"Returned error:","level":"error","message":"Failed to create auction \"Financial time-series dataset Q1 2024 — 500 equities, hourly OHLCV\"","timestamp":"2026-04-21 11:02:44"}
+{"error":"Returned error:","level":"error","message":"Failed to create auction \"Real-time weather sensor data — 1000 IoT sensors across EU\"","timestamp":"2026-04-21 11:02:48"}
+{"error":"Returned error: ","level":"error","message":"Failed to fetch deployed campaigns","timestamp":"2026-04-21 11:03:24"}
+{"error":"Returned error: ","level":"error","message":"Failed to create auction \"Financial time-series dataset Q1 2024 — 500 equities, hourly OHLCV\"","timestamp":"2026-04-21 11:03:25"}
+{"error":"Returned error: ","level":"error","message":"Failed to create auction \"Real-time weather sensor data — 1000 IoT sensors across EU\"","timestamp":"2026-04-21 11:03:28"}
+{"error":"Returned error: ","level":"error","message":"Failed to fetch deployed campaigns","timestamp":"2026-04-21 11:03:54"}
+{"error":"Returned error: ","level":"error","message":"Failed to fetch deployed campaigns","timestamp":"2026-04-21 11:04:02"}
+{"error":"Returned error:","level":"error","message":"Bid failed on 0xB9fD947752305cBc4393A3e2e69F06c8C3aBE6C7","timestamp":"2026-04-21 11:04:04"}
+{"error":"Returned error:","level":"error","message":"Bid failed on 0xB9fD947752305cBc4393A3e2e69F06c8C3aBE6C7","timestamp":"2026-04-21 11:04:39"}
+{"error":"Returned error:","level":"error","message":"Cycle error","timestamp":"2026-04-21 11:04:39"}
+{"error":"Returned error: ","level":"error","message":"Failed to fetch deployed campaigns","timestamp":"2026-04-21 11:10:38"}
+{"error":"Returned error:","level":"error","message":"Bid failed on 0xB9fD947752305cBc4393A3e2e69F06c8C3aBE6C7","timestamp":"2026-04-21 11:10:39"}
+{"error":"Returned error:","level":"error","message":"Cycle error","timestamp":"2026-04-21 11:10:39"}
+{"error":"Returned error: ","level":"error","message":"Failed to fetch deployed campaigns","timestamp":"2026-04-21 11:11:25"}
+{"error":"Returned error: ","level":"error","message":"Failed to fetch deployed campaigns","timestamp":"2026-04-21 11:11:42"}
+{"error":"Returned error: ","level":"error","message":"Failed to fetch deployed campaigns","timestamp":"2026-04-21 11:11:47"}
+{"error":"Returned error: ","level":"error","message":"Failed to fetch deployed campaigns","timestamp":"2026-04-21 11:12:02"}
+{"error":"Returned error: ","level":"error","message":"Failed to fetch deployed campaigns","timestamp":"2026-04-21 11:12:08"}
+{"error":"Returned error: ","level":"error","message":"Failed to fetch deployed campaigns","timestamp":"2026-04-21 11:12:36"}
+{"error":"Returned error: ","level":"error","message":"Failed to fetch deployed campaigns","timestamp":"2026-04-21 11:13:16"}
+{"error":"Returned error: ","level":"error","message":"Failed to fetch deployed campaigns","timestamp":"2026-04-21 11:13:24"}
+{"error":"Returned error: ","level":"error","message":"Failed to fetch deployed campaigns","timestamp":"2026-04-21 11:13:37"}
+{"error":"Returned error: ","level":"error","message":"Failed to fetch deployed campaigns","timestamp":"2026-04-21 11:14:02"}
+{"error":"Returned error: ","level":"error","message":"Failed to fetch deployed campaigns","timestamp":"2026-04-21 11:14:09"}
+{"error":"Returned error:","level":"error","message":"Admin API error","timestamp":"2026-04-21 11:15:23"}
+{"error":"Returned error: ","level":"error","message":"Failed to fetch deployed campaigns","timestamp":"2026-04-21 11:15:31"}
+{"error":"Returned error: ","level":"error","message":"Failed to fetch deployed campaigns","timestamp":"2026-04-21 11:15:40"}
+{"error":"Returned error:","level":"error","message":"Admin API error","timestamp":"2026-04-21 11:15:45"}
+{"error":"Returned error: ","level":"error","message":"Failed to fetch deployed campaigns","timestamp":"2026-04-21 11:15:49"}
+{"error":"Returned error:","level":"error","message":"Admin API error","timestamp":"2026-04-21 11:15:53"}
+{"error":"Returned error: ","level":"error","message":"Failed to fetch deployed campaigns","timestamp":"2026-04-21 11:15:57"}
+{"error":"Returned error:","level":"error","message":"Admin API error","timestamp":"2026-04-21 11:16:02"}
+{"error":"Returned error: ","level":"error","message":"Failed to fetch deployed campaigns","timestamp":"2026-04-21 11:16:05"}
+{"error":"Returned error:","level":"error","message":"Admin API error","timestamp":"2026-04-21 11:16:10"}
+{"error":"Returned error: ","level":"error","message":"Failed to fetch deployed campaigns","timestamp":"2026-04-21 11:16:14"}
+{"error":"Returned error:","level":"error","message":"Admin API error","timestamp":"2026-04-21 11:16:30"}
+{"error":"Returned error:","level":"error","message":"Admin API error","timestamp":"2026-04-21 11:16:35"}
+{"error":"Returned error: ","level":"error","message":"Failed to fetch deployed campaigns","timestamp":"2026-04-21 11:16:36"}
+{"error":"Returned error:","level":"error","message":"Admin API error","timestamp":"2026-04-21 11:16:40"}
+{"error":"Returned error: ","level":"error","message":"Failed to fetch deployed campaigns","timestamp":"2026-04-21 11:16:44"}
+{"error":"Returned error:","level":"error","message":"Admin API error","timestamp":"2026-04-21 11:16:45"}
+{"error":"Returned error: ","level":"error","message":"Failed to fetch deployed campaigns","timestamp":"2026-04-21 11:16:49"}
+{"error":"Returned error:","level":"error","message":"Admin API error","timestamp":"2026-04-21 11:16:52"}
+{"error":"Returned error: ","level":"error","message":"Failed to fetch deployed campaigns","timestamp":"2026-04-21 11:16:54"}
+{"error":"Returned error:","level":"error","message":"Admin API error","timestamp":"2026-04-21 11:16:57"}
+{"error":"Returned error: ","level":"error","message":"Failed to fetch deployed campaigns","timestamp":"2026-04-21 11:17:01"}
+{"error":"Returned error:","level":"error","message":"Admin API error","timestamp":"2026-04-21 11:17:02"}
+{"error":"Returned error: ","level":"error","message":"Failed to fetch deployed campaigns","timestamp":"2026-04-21 11:17:06"}
+{"error":"Returned error:","level":"error","message":"Admin API error","timestamp":"2026-04-21 11:17:10"}
+{"error":"Returned error: ","level":"error","message":"Failed to fetch deployed campaigns","timestamp":"2026-04-21 11:17:14"}
+{"error":"Returned error: ","level":"error","message":"Failed to fetch deployed campaigns","timestamp":"2026-04-21 11:17:18"}
+{"error":"Returned error: ","level":"error","message":"Failed to fetch deployed campaigns","timestamp":"2026-04-21 11:17:27"}
+{"error":"Returned error: ","level":"error","message":"Failed to fetch deployed campaigns","timestamp":"2026-04-21 11:17:35"}
+{"error":"Returned error: ","level":"error","message":"Failed to fetch deployed campaigns","timestamp":"2026-04-21 11:17:44"}
+{"error":"Returned error: ","level":"error","message":"Failed to fetch deployed campaigns","timestamp":"2026-04-21 11:17:52"}
+{"error":"Returned error: ","level":"error","message":"Failed to fetch deployed campaigns","timestamp":"2026-04-21 11:18:01"}
+{"error":"Returned error: ","level":"error","message":"Failed to fetch deployed campaigns","timestamp":"2026-04-21 11:18:09"}
+{"error":"Returned error: ","level":"error","message":"Failed to fetch deployed campaigns","timestamp":"2026-04-21 11:18:17"}
+{"error":"Returned error: ","level":"error","message":"Failed to fetch deployed campaigns","timestamp":"2026-04-21 11:18:18"}
+{"error":"Returned error: ","level":"error","message":"Failed to fetch deployed campaigns","timestamp":"2026-04-21 11:18:26"}
+{"error":"Returned error: ","level":"error","message":"Failed to fetch deployed campaigns","timestamp":"2026-04-21 11:18:35"}
+{"error":"Returned error: ","level":"error","message":"Failed to fetch deployed campaigns","timestamp":"2026-04-21 11:18:36"}
+{"error":"Returned error: ","level":"error","message":"Failed to fetch deployed campaigns","timestamp":"2026-04-21 11:19:08"}
+{"error":"Returned error: ","level":"error","message":"Failed to fetch deployed campaigns","timestamp":"2026-04-21 11:19:13"}
+{"error":"Returned error: ","level":"error","message":"Failed to fetch deployed campaigns","timestamp":"2026-04-21 11:19:23"}
+{"error":"Returned error: ","level":"error","message":"Failed to fetch deployed campaigns","timestamp":"2026-04-21 11:19:28"}
+{"error":"Returned error: ","level":"error","message":"Failed to fetch deployed campaigns","timestamp":"2026-04-21 11:19:33"}
+{"error":"Returned error: ","level":"error","message":"Failed to fetch deployed campaigns","timestamp":"2026-04-21 11:19:33"}
+{"error":"Returned error: ","level":"error","message":"Failed to fetch deployed campaigns","timestamp":"2026-04-21 11:19:38"}
+{"error":"Returned error: ","level":"error","message":"Failed to fetch deployed campaigns","timestamp":"2026-04-21 11:19:42"}
+{"error":"Returned error: ","level":"error","message":"Failed to fetch deployed campaigns","timestamp":"2026-04-21 11:19:47"}
+{"error":"Returned error: ","level":"error","message":"Failed to fetch deployed campaigns","timestamp":"2026-04-21 11:19:48"}
+{"error":"Returned error: ","level":"error","message":"Failed to fetch deployed campaigns","timestamp":"2026-04-21 11:19:56"}
+{"error":"Returned error: ","level":"error","message":"Failed to fetch deployed campaigns","timestamp":"2026-04-21 11:20:02"}
+{"error":"Returned error: ","level":"error","message":"Failed to fetch deployed campaigns","timestamp":"2026-04-21 11:20:05"}
+{"error":"Returned error: ","level":"error","message":"Failed to fetch deployed campaigns","timestamp":"2026-04-21 11:20:08"}
+{"error":"Returned error: ","level":"error","message":"Failed to fetch deployed campaigns","timestamp":"2026-04-21 11:20:10"}
+{"error":"Returned error: ","level":"error","message":"Failed to fetch deployed campaigns","timestamp":"2026-04-21 11:20:14"}
+{"error":"Returned error: ","level":"error","message":"Failed to fetch deployed campaigns","timestamp":"2026-04-21 11:20:19"}
+{"error":"Returned error: ","level":"error","message":"Failed to fetch deployed campaigns","timestamp":"2026-04-21 11:20:22"}
+{"error":"Returned error: ","level":"error","message":"Failed to fetch deployed campaigns","timestamp":"2026-04-21 11:20:23"}
+{"error":"Returned error: ","level":"error","message":"Failed to fetch deployed campaigns","timestamp":"2026-04-21 11:20:30"}
+{"error":"Returned error: ","level":"error","message":"Failed to fetch deployed campaigns","timestamp":"2026-04-21 11:20:32"}
+{"error":"Returned error: ","level":"error","message":"Failed to fetch deployed campaigns","timestamp":"2026-04-21 11:20:37"}
+{"error":"Returned error: ","level":"error","message":"Failed to fetch deployed campaigns","timestamp":"2026-04-21 11:20:37"}
+{"error":"Returned error: ","level":"error","message":"Failed to fetch deployed campaigns","timestamp":"2026-04-21 11:20:43"}
+{"error":"Returned error: ","level":"error","message":"Failed to fetch deployed campaigns","timestamp":"2026-04-21 11:20:45"}
+{"error":"Returned error: ","level":"error","message":"Failed to fetch deployed campaigns","timestamp":"2026-04-21 11:20:53"}
+{"error":"Returned error: ","level":"error","message":"Failed to fetch deployed campaigns","timestamp":"2026-04-21 11:20:54"}
+{"error":"Returned error: ","level":"error","message":"Failed to fetch deployed campaigns","timestamp":"2026-04-21 11:21:02"}
+{"error":"Returned error: ","level":"error","message":"Failed to fetch deployed campaigns","timestamp":"2026-04-21 11:21:08"}
+{"error":"Returned error: ","level":"error","message":"Failed to fetch deployed campaigns","timestamp":"2026-04-21 11:21:11"}
+{"error":"Returned error: ","level":"error","message":"Failed to fetch deployed campaigns","timestamp":"2026-04-21 11:21:18"}
+{"error":"Returned error: ","level":"error","message":"Failed to fetch deployed campaigns","timestamp":"2026-04-21 11:21:28"}
+{"error":"Returned error: ","level":"error","message":"Failed to fetch deployed campaigns","timestamp":"2026-04-21 11:21:34"}
+{"error":"Returned error: ","level":"error","message":"Failed to fetch deployed campaigns","timestamp":"2026-04-21 11:21:38"}
+{"error":"Returned error: ","level":"error","message":"Failed to fetch deployed campaigns","timestamp":"2026-04-21 11:21:42"}
+{"error":"Returned error: ","level":"error","message":"Failed to fetch deployed campaigns","timestamp":"2026-04-21 11:21:43"}
+{"error":"Returned error: ","level":"error","message":"Failed to fetch deployed campaigns","timestamp":"2026-04-21 11:21:48"}
+{"error":"Returned error: ","level":"error","message":"Failed to fetch deployed campaigns","timestamp":"2026-04-21 11:21:53"}
+{"error":"Returned error: ","level":"error","message":"Failed to fetch deployed campaigns","timestamp":"2026-04-21 11:21:58"}
+{"error":"Returned error: ","level":"error","message":"Failed to fetch deployed campaigns","timestamp":"2026-04-21 11:22:03"}
+{"error":"Returned error: ","level":"error","message":"Failed to fetch deployed campaigns","timestamp":"2026-04-21 11:22:08"}
+{"error":"Returned error: ","level":"error","message":"Failed to fetch deployed campaigns","timestamp":"2026-04-21 11:22:09"}
+{"error":"Returned error: ","level":"error","message":"Failed to fetch deployed campaigns","timestamp":"2026-04-21 11:22:13"}
+{"error":"Returned error: ","level":"error","message":"Failed to fetch deployed campaigns","timestamp":"2026-04-21 11:22:23"}
+{"error":"Returned error: ","level":"error","message":"Failed to fetch deployed campaigns","timestamp":"2026-04-21 11:22:28"}
+{"error":"Returned error: ","level":"error","message":"Failed to fetch deployed campaigns","timestamp":"2026-04-21 11:22:33"}
+{"error":"Returned error: ","level":"error","message":"Failed to fetch deployed campaigns","timestamp":"2026-04-21 11:22:38"}
+{"error":"Returned error: ","level":"error","message":"Failed to fetch deployed campaigns","timestamp":"2026-04-21 11:22:43"}
+{"error":"Returned error: ","level":"error","message":"Failed to fetch deployed campaigns","timestamp":"2026-04-21 11:22:48"}
+{"error":"Returned error: ","level":"error","message":"Failed to fetch deployed campaigns","timestamp":"2026-04-21 11:22:53"}
+{"error":"Returned error: ","level":"error","message":"Failed to fetch deployed campaigns","timestamp":"2026-04-21 11:22:58"}
+{"error":"Returned error: ","level":"error","message":"Failed to fetch deployed campaigns","timestamp":"2026-04-21 11:23:03"}
+{"error":"Returned error: ","level":"error","message":"Failed to fetch deployed campaigns","timestamp":"2026-04-21 11:23:08"}
+{"error":"Returned error: ","level":"error","message":"Failed to fetch deployed campaigns","timestamp":"2026-04-21 11:23:18"}
+{"error":"Returned error: ","level":"error","message":"Failed to fetch deployed campaigns","timestamp":"2026-04-21 11:23:24"}
+{"error":"Returned error: ","level":"error","message":"Failed to fetch deployed campaigns","timestamp":"2026-04-21 11:23:33"}
+{"error":"Returned error: ","level":"error","message":"Failed to fetch deployed campaigns","timestamp":"2026-04-21 11:23:42"}
+{"error":"Returned error: ","level":"error","message":"Failed to fetch deployed campaigns","timestamp":"2026-04-21 11:23:44"}
+{"error":"Returned error: ","level":"error","message":"Failed to fetch deployed campaigns","timestamp":"2026-04-21 11:23:52"}
+{"error":"Returned error: ","level":"error","message":"Failed to fetch deployed campaigns","timestamp":"2026-04-21 11:23:59"}
+{"error":"Returned error: ","level":"error","message":"Failed to fetch deployed campaigns","timestamp":"2026-04-21 11:24:02"}
+{"error":"Returned error:","level":"error","message":"Admin API error","timestamp":"2026-04-21 11:24:30"}
+{"error":"Returned error:","level":"error","message":"Admin API error","timestamp":"2026-04-21 11:24:33"}
+{"error":"Returned error:","level":"error","message":"Admin API error","timestamp":"2026-04-21 11:30:09"}
+{"error":"Returned error:","level":"error","message":"Admin API error","timestamp":"2026-04-21 11:30:10"}
+{"error":"Returned error:","level":"error","message":"Admin API error","timestamp":"2026-04-21 11:33:32"}
+{"error":"Returned error: ","level":"error","message":"Failed to fetch deployed campaigns","timestamp":"2026-04-21 11:34:09"}
+{"error":"Returned error: ","level":"error","message":"Failed to fetch deployed campaigns","timestamp":"2026-04-21 11:34:19"}
+{"error":"Returned error: ","level":"error","message":"Failed to fetch deployed campaigns","timestamp":"2026-04-21 11:36:50"}
+{"error":"Returned error: ","level":"error","message":"Failed to fetch deployed campaigns","timestamp":"2026-04-21 11:36:59"}
+{"error":"Returned error: ","level":"error","message":"Failed to fetch deployed campaigns","timestamp":"2026-04-21 11:37:20"}
+{"error":"Returned error: ","level":"error","message":"Failed to fetch deployed campaigns","timestamp":"2026-04-21 11:40:51"}
+{"error":"Returned error: ","level":"error","message":"Failed to fetch deployed campaigns","timestamp":"2026-04-21 11:41:08"}
+{"error":"Returned error: ","level":"error","message":"Failed to fetch deployed campaigns","timestamp":"2026-04-21 11:41:19"}
+{"error":"Returned error: ","level":"error","message":"Failed to fetch deployed campaigns","timestamp":"2026-04-21 11:41:31"}
+{"error":"Returned error: ","level":"error","message":"Failed to fetch deployed campaigns","timestamp":"2026-04-21 11:41:43"}

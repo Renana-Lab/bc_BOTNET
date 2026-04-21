@@ -1,39 +1,28 @@
 {
   "name": "datamarketplace-bot",
   "version": "2.0.0",
-<<<<<<< HEAD
   "description": "Automated auction bot for datamarketplaces.net",
   "main": "index.js",
   "type": "commonjs",
   "scripts": {
-    "admin":    "node index.js --mode=admin",
-    "start":    "node index.js --mode=admin",
+    "admin": "node index.js --mode=admin",
+    "start": "node index.js --mode=admin",
     "simulate": "node index.js --mode=simulate",
-    "buy":      "node index.js --mode=buy",
-    "sell":     "node index.js --mode=sell",
-    "smart":    "node index.js --mode=smart",
-    "dumb":     "node index.js --mode=dumb",
-=======
-  "description": "Automated auction bot for datamarketplaces.net — direct smart contract integration (Sepolia)",
-  "main": "src/index.js",
-  "type": "commonjs",
-  "scripts": {
-    "start":    "node index.js",
-    "simulate": "node index.js --mode=simulate",
-    "buy":      "node index.js --mode=buy",
-    "sell":     "node index.js --mode=sell",
->>>>>>> fceb3ee0a64fd3207910a19e4b7d3ab9011c4c0a
-    "auto":     "node index.js --mode=auto",
-    "status":   "node index.js --mode=status",
-    "winner":   "node index.js --mode=winner",
-    "listen":   "node index.js --mode=listen",
-    "test":     "node test.js"
+    "buy": "node index.js --mode=buy",
+    "sell": "node index.js --mode=sell",
+    "smart": "node index.js --mode=smart",
+    "dumb": "node index.js --mode=dumb",
+    "auto": "node index.js --mode=auto",
+    "status": "node index.js --mode=status",
+    "winner": "node index.js --mode=winner",
+    "listen": "node index.js --mode=listen",
+    "test": "node test.js"
   },
   "dependencies": {
-    "web3": "^4.9.0",
+    "chalk": "^4.1.2",
     "dotenv": "^16.4.5",
-    "winston": "^3.13.0",
     "node-cron": "^3.0.3",
-    "chalk": "^4.1.2"
+    "web3": "^4.9.0",
+    "winston": "^3.13.0"
   }
 }
