@@ -32,9 +32,9 @@
   .stack { display: flex; flex-direction: column; gap: 14px; }
   .card { background: rgba(23, 32, 51, 0.96); border: 1px solid var(--border); border-radius: var(--radius); padding: 14px; }
   .card h2 { margin: 0 0 12px; font-size: 12px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.08em; }
-  .grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; }
-  .stat { background: var(--surface-2); border-radius: 8px; padding: 10px; }
-  .stat .value { font-size: 20px; font-weight: 700; }
+  .grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
+  .stat { background: var(--surface-2); border-radius: 8px; padding: 10px; min-width: 0; overflow: hidden; }
+  .stat .value { font-size: clamp(15px, 1.8vw, 20px); font-weight: 700; line-height: 1.15; overflow-wrap: anywhere; word-break: break-word; }
   .stat .label { font-size: 11px; color: var(--muted); margin-top: 4px; }
   .field { margin-bottom: 10px; }
   .field label { display: block; font-size: 12px; color: var(--muted); margin-bottom: 5px; }
@@ -136,6 +136,10 @@
         <div class="field">
           <label>Target active sell auctions</label>
           <input id="cfgTargetActiveSellAuctions" type="number" min="0" max="20" />
+        </div>
+        <div class="field">
+          <label>Max total bot auctions</label>
+          <input id="cfgMaxTotalSellAuctions" type="number" min="0" max="500" />
         </div>
         <div class="mono" id="lastCycle" style="margin-top:10px">Last cycle: never</div>
         <div class="card" style="margin-top:12px;background:#121b2d">
@@ -250,6 +254,13 @@ const CAMPAIGN_ABI = [
     "outputs": [{ "internalType": "bool", "name": "", "type": "bool" }],
     "stateMutability": "view",
     "type": "function"
+  },
+  {
+    "inputs": [{ "internalType": "address", "name": "bidder", "type": "address" }],
+    "name": "getBid",
+    "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
+    "stateMutability": "view",
+    "type": "function"
   }
 ];
 let statusPoll;
@@ -259,6 +270,8 @@ let saveTimer;
 let isSavingConfig = false;
 let browserProvider;
 let browserAccount = null;
+let lastEnableSellingState = false;
+let currentBotWallet = null;
 
 async function init() {
   await loadStatus();
@@ -278,12 +291,17 @@ function startPolling() {
 async function loadStatus() {
   try {
     const status = await get('/api/status');
-    document.getElementById('balETH').textContent = status.balanceETH;
-    document.getElementById('budgetWei').textContent = status.budgetWei;
+    const balEl = document.getElementById('balETH');
+    const budgetEl = document.getElementById('budgetWei');
+    balEl.textContent = status.balanceETH;
+    balEl.title = status.balanceETH;
+    budgetEl.textContent = formatLargeInteger(status.budgetWei);
+    budgetEl.title = status.budgetWei;
     document.getElementById('statBids').textContent = status.stats.bids;
     document.getElementById('statCreated').textContent = status.stats.created;
     document.getElementById('walletAddr').textContent = status.wallet;
     document.getElementById('walletShort').textContent = `${status.wallet.slice(0, 6)}...${status.wallet.slice(-4)}`;
+    currentBotWallet = String(status.wallet || '').toLowerCase();
     document.getElementById('statusDot').className = `dot ${status.botRunning ? 'on' : ''}`;
     document.getElementById('modeBadge').textContent = status.config.BOT_MODE.toUpperCase();
     document.getElementById('btnStart').disabled = status.botRunning;
@@ -308,6 +326,8 @@ function syncConfig(config) {
   setChecked('cfgAutoGenerate', config.AUTO_GENERATE_AUCTIONS);
   setValue('cfgAutoGenerateCount', config.AUTO_GENERATE_COUNT);
   setValue('cfgTargetActiveSellAuctions', config.TARGET_ACTIVE_SELL_AUCTIONS);
+  setValue('cfgMaxTotalSellAuctions', config.MAX_TOTAL_SELL_AUCTIONS);
+  lastEnableSellingState = String(config.ENABLE_SELLING) === 'true';
 }
 
 async function loadAuctions() {
@@ -380,6 +400,8 @@ function renderAuctions(auctions) {
 
 async function saveConfig() {
   if (isSavingConfig) return;
+  const enableSellingNow = document.getElementById('cfgEnableSelling').checked;
+  const justEnabledSelling = !lastEnableSellingState && enableSellingNow;
   const payload = {
     BOT_MODE: 'auto',
     TRADING_PROFILE: 'balanced',
@@ -395,12 +417,27 @@ async function saveConfig() {
     ENABLE_FINALIZE: document.getElementById('cfgEnableFinalize').checked ? 'true' : 'false',
     AUTO_GENERATE_AUCTIONS: document.getElementById('cfgAutoGenerate').checked ? 'true' : 'false',
     AUTO_GENERATE_COUNT: document.getElementById('cfgAutoGenerateCount').value,
-    TARGET_ACTIVE_SELL_AUCTIONS: document.getElementById('cfgTargetActiveSellAuctions').value
+    TARGET_ACTIVE_SELL_AUCTIONS: document.getElementById('cfgTargetActiveSellAuctions').value,
+    MAX_TOTAL_SELL_AUCTIONS: document.getElementById('cfgMaxTotalSellAuctions').value
   };
   try {
     isSavingConfig = true;
     await post('/api/config', payload);
+    lastEnableSellingState = enableSellingNow;
     toast('Config saved', 'ok');
+    if (justEnabledSelling) {
+      const seedRes = await post('/api/seed-selling', {
+        count: document.getElementById('cfgTargetActiveSellAuctions').value || '1'
+      });
+      if (seedRes.ok) {
+        const created = seedRes.results.filter((item) => item.success).length;
+        toast(`Selling enabled and ${created} auction(s) created`, 'ok');
+      } else {
+        toast(`Selling enabled but create failed: ${seedRes.error}`, 'err');
+      }
+      await post('/api/run-once', {});
+      setTimeout(() => { loadStatus(); loadAuctions(); }, 1500);
+    }
   } catch (err) {
     toast(err.message, 'err');
   } finally {
@@ -431,6 +468,7 @@ async function loadAuctionsViaBrowser(force = false) {
 
   const accounts = await window.ethereum.request({ method: 'eth_accounts' });
   browserAccount = accounts[0] ? accounts[0].toLowerCase() : null;
+  const viewAccount = currentBotWallet || browserAccount;
 
   const factory = new window.ethers.Contract(FACTORY_ADDRESS, FACTORY_ABI, browserProvider);
   const addresses = await factory.getDeployedCampaigns();
@@ -453,6 +491,14 @@ async function loadAuctionsViaBrowser(force = false) {
         const highestBidder = String(summary[7] || '');
         const endTimeSec = Number(summary[9] || 0);
         const isActive = endTimeSec > now;
+        let myBid = 0n;
+        if (viewAccount && isActive) {
+          try {
+            myBid = BigInt(await campaign.getBid(viewAccount));
+          } catch (_) {}
+        }
+        const amIBidding = myBid > 0n;
+        const amIWinning = viewAccount ? highestBidder.toLowerCase() === viewAccount && isActive : false;
 
         return {
           address,
@@ -464,11 +510,11 @@ async function loadAuctionsViaBrowser(force = false) {
           endTimeSec,
           secondsLeft: Math.max(0, endTimeSec - now),
           isActive,
-          isManager: browserAccount ? manager.toLowerCase() === browserAccount : false,
-          isWinner: browserAccount ? highestBidder.toLowerCase() === browserAccount : false,
-          amIBidding: false,
-          amIWinning: browserAccount ? highestBidder.toLowerCase() === browserAccount && isActive : false,
-          myBid: '0',
+          isManager: viewAccount ? manager.toLowerCase() === viewAccount : false,
+          isWinner: viewAccount ? highestBidder.toLowerCase() === viewAccount : false,
+          amIBidding,
+          amIWinning,
+          myBid: myBid.toString(),
           closed: Boolean(closed),
         };
       } catch (err) {
@@ -604,6 +650,25 @@ function formatTime(seconds) {
   if (seconds < 60) return `${seconds}s`;
   if (seconds < 3600) return `${Math.floor(seconds / 60)}m ${seconds % 60}s`;
   return `${Math.floor(seconds / 3600)}h ${Math.floor((seconds % 3600) / 60)}m`;
+}
+
+function formatLargeInteger(value) {
+  const str = String(value ?? '');
+  if (!/^\d+$/.test(str)) return str;
+  if (str.length <= 9) return Number(str).toLocaleString();
+  const suffixes = [
+    { size: 15, label: 'q' },
+    { size: 12, label: 't' },
+    { size: 9, label: 'b' },
+  ];
+  for (const suffix of suffixes) {
+    if (str.length > suffix.size) {
+      const whole = str.slice(0, str.length - suffix.size);
+      const frac = str.slice(str.length - suffix.size, str.length - suffix.size + 2).replace(/0+$/, '');
+      return frac ? `${whole}.${frac}${suffix.label}` : `${whole}${suffix.label}`;
+    }
+  }
+  return Number(str).toLocaleString();
 }
 
 function formatAuctionDate(auction) {

@@ -351,3 +351,11 @@
 {"error":"Returned error: ","level":"error","message":"Failed to fetch deployed campaigns","timestamp":"2026-04-21 11:41:19"}
 {"error":"Returned error: ","level":"error","message":"Failed to fetch deployed campaigns","timestamp":"2026-04-21 11:41:31"}
 {"error":"Returned error: ","level":"error","message":"Failed to fetch deployed campaigns","timestamp":"2026-04-21 11:41:43"}
+{"error":"Returned error:","level":"error","message":"Admin API error","timestamp":"2026-04-21 11:57:39"}
+{"error":"Returned error:","level":"error","message":"Admin API error","timestamp":"2026-04-21 11:57:40"}
+{"error":"Returned error:","level":"error","message":"Failed to create auction \"Financial time-series dataset Q1 2024 — 500 equities, hourly OHLCV\"","timestamp":"2026-04-21 12:02:00"}
+{"error":"Returned error:","level":"error","message":"Failed to create auction \"Real-time weather sensor data — 1000 IoT sensors across EU\"","timestamp":"2026-04-21 12:02:04"}
+{"error":"invalid chain ID","level":"error","message":"Failed to create generated auction \"Wallet engagement clusters with purchase-intent scoring | Wallet behavior bundle\"","timestamp":"2026-04-21 12:09:32"}
+{"error":"invalid chain ID","level":"error","message":"Failed to create generated auction \"Fresh browsing-intent segments for high-spend crypto consumers | Consumer intelligence feed\"","timestamp":"2026-04-21 12:09:37"}
+{"error":"Returned error: ","level":"error","message":"Failed to create generated auction \"Wallet engagement clusters with purchase-intent scoring | Wallet behavior bundle\"","timestamp":"2026-04-21 12:12:48"}
+{"error":"Returned error:","level":"error","message":"Failed to create generated auction \"Fresh browsing-intent segments for high-spend crypto consumers | Consumer intelligence feed\"","timestamp":"2026-04-21 12:12:55"}

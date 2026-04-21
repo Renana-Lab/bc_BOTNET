@@ -78,6 +78,11 @@ async function bidOnEligibleAuctions(auctions, mode = 'normal') {
 
     try {
       const receipt = await placeBid(auction.address, decision.amount);
+      logger.info(`Bid sent for "${auction.dataDescription}"`, {
+        address: auction.address,
+        amountWei: decision.amount.toString(),
+        tx: receipt.transactionHash,
+      });
       results.push({ auction, amount: decision.amount, success: true, tx: receipt.transactionHash });
     } catch (err) {
       const reason = unwrapError(err);
@@ -103,6 +108,11 @@ async function bidOnEligibleAuctions(auctions, mode = 'normal') {
       } else {
         try {
           const receipt = await placeBid(exploratory.auction.address, exploratory.amount);
+          logger.info(`Exploratory bid sent for "${exploratory.auction.dataDescription}"`, {
+            address: exploratory.auction.address,
+            amountWei: exploratory.amount.toString(),
+            tx: receipt.transactionHash,
+          });
           results.push({ auction: exploratory.auction, amount: exploratory.amount, success: true, tx: receipt.transactionHash, exploratory: true });
         } catch (err) {
           const reason = unwrapError(err);

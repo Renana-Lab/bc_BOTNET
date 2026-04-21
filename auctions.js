@@ -5,6 +5,9 @@ let lastAuctionSnapshot = [];
 let lastAuctionSnapshotAt = null;
 let lastBudgetValue = 0n;
 let lastFetchPromise = null;
+let lastBudgetFetchAt = 0;
+
+const BUDGET_CACHE_TTL_MS = 15000;
 
 async function fetchAllAuctions() {
   if (lastFetchPromise) {
@@ -141,17 +144,24 @@ async function fetchAllAuctionsInternal() {
 }
 
 async function fetchMyBudget() {
+  const now = Date.now();
+  if (lastBudgetFetchAt && (now - lastBudgetFetchAt) < BUDGET_CACHE_TTL_MS) {
+    return lastBudgetValue;
+  }
+
   const factory = getFactory();
   const me = getAccount().address;
   try {
     const budget = await retryRpc(() => factory.methods.getBudget(me).call());
     lastBudgetValue = BigInt(budget);
+    lastBudgetFetchAt = now;
     return lastBudgetValue;
   } catch (err) {
     logger.warn('Failed to fetch on-chain budget, falling back to wallet balance', { error: err.message });
     try {
       const balance = await retryRpc(() => getWeb3().eth.getBalance(me));
       lastBudgetValue = BigInt(balance);
+      lastBudgetFetchAt = now;
       return lastBudgetValue;
     } catch (balanceErr) {
       logger.warn('Failed to fetch wallet balance, using last known budget value', { error: balanceErr.message });

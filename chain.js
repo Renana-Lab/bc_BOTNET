@@ -7,6 +7,10 @@ const logger = require('./logger');
 const CampaignFactoryABI = require(path.join(__dirname, 'abis', 'CampaignFactory.json')).abi;
 const CampaignABI = require(path.join(__dirname, 'abis', 'Campaign.json')).abi;
 
+const DEFAULT_HTTP_FALLBACKS = [
+  'https://sepolia.infura.io/v3/6426761d274542bb9652e9a5aff35a0c',
+];
+
 function requireEnv(name) {
   const value = process.env[name];
   if (!value || value.startsWith('YOUR') || value === '0xYourPrivateKeyHere') {
@@ -20,36 +24,41 @@ let account;
 let factory;
 let factoryAddress;
 let nonce = null;
+let rpcHttpCandidates = [];
+let activeRpcIndex = 0;
+let lastRpcSwitchAt = 0;
+let expectedChainId = 11155111n;
+
+const RPC_ROTATION_COOLDOWN_MS = 60000;
 
 async function init() {
   const privateKey = requireEnv('PRIVATE_KEY');
-  const rpcHttp = requireEnv('RPC_HTTP');
+  rpcHttpCandidates = buildRpcCandidates();
+  if (rpcHttpCandidates.length === 0) {
+    throw new Error('Missing required env value: RPC_HTTP');
+  }
   factoryAddress = process.env.FACTORY_ADDRESS || '0xb61Cd17D498f82E9F22771254C31bCBBb5781540';
 
-  web3 = new Web3(new Web3.providers.HttpProvider(rpcHttp, { timeout: 30000 }));
-  web3.eth.handleRevert = true;
-
-  account = web3.eth.accounts.privateKeyToAccount(privateKey);
-  web3.eth.accounts.wallet.add(account);
-  web3.eth.defaultAccount = account.address;
+  account = new Web3().eth.accounts.privateKeyToAccount(privateKey);
+  connectHttpProvider(rpcHttpCandidates[0]);
+  attachAccount();
 
   let chainId;
   let balance;
   try {
-    chainId = await retryRpc(() => web3.eth.getChainId());
-    nonce = Number(await retryRpc(() => web3.eth.getTransactionCount(account.address, 'pending')));
-    balance = await retryRpc(() => web3.eth.getBalance(account.address));
+    chainId = await retryRpc(() => web3.eth.getChainId(), 8, 600);
+    nonce = Number(await retryRpc(() => web3.eth.getTransactionCount(account.address, 'pending'), 8, 600));
+    balance = await retryRpc(() => web3.eth.getBalance(account.address), 8, 600);
   } catch (err) {
     throw new Error(`Cannot connect to Ethereum RPC: ${err.message}`);
   }
 
-  const expectedChainId = BigInt(process.env.CHAIN_ID || '11155111');
+  expectedChainId = BigInt(process.env.CHAIN_ID || '11155111');
   if (chainId !== expectedChainId) {
     throw new Error(`Wrong network. Expected ${expectedChainId}, got ${chainId}`);
   }
 
-  factory = new web3.eth.Contract(CampaignFactoryABI, factoryAddress);
-  factory.handleRevert = true;
+  bindFactory();
 
   try {
     const code = await web3.eth.getCode(factoryAddress);
@@ -64,16 +73,25 @@ async function init() {
     balanceETH: Number(web3.utils.fromWei(balance.toString(), 'ether')).toFixed(6),
     factory: factoryAddress,
     nonce,
+    rpc: rpcHttpCandidates[activeRpcIndex],
   });
 
   return { web3, account, factory };
 }
 
 async function buildTxParams(extra = {}) {
-  const gasPrice = await web3.eth.getGasPrice();
+  const pendingNonce = Number(await retryRpc(() => web3.eth.getTransactionCount(account.address, 'pending'), 6, 500));
+  nonce = nonce === null ? pendingNonce : Math.max(nonce, pendingNonce);
+  const gasPrice = await retryRpc(() => web3.eth.getGasPrice(), 6, 500);
   const bumpedGasPrice = (BigInt(gasPrice) * 120n / 100n).toString();
   const txNonce = nonce++;
-  return { from: account.address, gasPrice: bumpedGasPrice, nonce: txNonce, ...extra };
+  return {
+    from: account.address,
+    gasPrice: bumpedGasPrice,
+    nonce: txNonce,
+    chainId: Number(expectedChainId),
+    ...extra,
+  };
 }
 
 async function resyncNonce() {
@@ -105,6 +123,72 @@ function unwrapError(err) {
   return String(err) || 'Unknown error';
 }
 
+function buildRpcCandidates() {
+  const configured = [process.env.RPC_HTTP, process.env.ALTERNATE_RPC_HTTP]
+    .flatMap((value) => String(value || '').split(','))
+    .map((value) => value.trim())
+    .filter(Boolean);
+
+  const seen = new Set();
+  return [...configured, ...DEFAULT_HTTP_FALLBACKS].filter((value) => {
+    if (!value || seen.has(value)) return false;
+    seen.add(value);
+    return true;
+  });
+}
+
+function connectHttpProvider(url) {
+  web3 = new Web3(new Web3.providers.HttpProvider(url, { timeout: 30000 }));
+  web3.eth.handleRevert = true;
+}
+
+function attachAccount() {
+  web3.eth.accounts.wallet.clear();
+  web3.eth.accounts.wallet.add(account);
+  web3.eth.defaultAccount = account.address;
+}
+
+function bindFactory() {
+  factory = new web3.eth.Contract(CampaignFactoryABI, factoryAddress);
+  factory.handleRevert = true;
+}
+
+async function rotateHttpProvider(reason = 'RPC fallback') {
+  if (rpcHttpCandidates.length <= 1) {
+    return false;
+  }
+
+  const now = Date.now();
+  if (lastRpcSwitchAt && (now - lastRpcSwitchAt) < RPC_ROTATION_COOLDOWN_MS) {
+    return false;
+  }
+
+  const nextIndex = (activeRpcIndex + 1) % rpcHttpCandidates.length;
+  if (nextIndex === activeRpcIndex) {
+    return false;
+  }
+
+  activeRpcIndex = nextIndex;
+  lastRpcSwitchAt = now;
+  connectHttpProvider(rpcHttpCandidates[activeRpcIndex]);
+  attachAccount();
+  bindFactory();
+  logger.warn(`${reason}; switched HTTP RPC`, { rpc: rpcHttpCandidates[activeRpcIndex] });
+  return true;
+}
+
+function shouldRotateRpc(err) {
+  const message = unwrapError(err).toLowerCase();
+  return (
+    message.includes('429')
+    || message.includes('too many requests')
+    || message.includes('rate limit')
+    || message.includes('throttle')
+    || message.includes('returned error:')
+    || message.includes('internal error')
+  );
+}
+
 function getCampaign(address) {
   if (!web3) throw new Error('Chain not initialized - call init() first');
   const campaign = new web3.eth.Contract(CampaignABI, address);
@@ -120,6 +204,7 @@ function getWeb3() { return web3; }
 function getAccount() { return account; }
 function getFactory() { return factory; }
 function getFactoryAddress() { return factoryAddress; }
+function getExpectedChainId() { return Number(expectedChainId); }
 
 async function retryRpc(fn, attempts = 6, delayMs = 500) {
   let lastError;
@@ -128,6 +213,9 @@ async function retryRpc(fn, attempts = 6, delayMs = 500) {
       return await fn();
     } catch (err) {
       lastError = err;
+      if (shouldRotateRpc(err) && attempt < attempts) {
+        await rotateHttpProvider('Primary RPC rejected request');
+      }
       if (attempt < attempts) {
         await new Promise((resolve) => setTimeout(resolve, delayMs * attempt));
       }
@@ -148,4 +236,5 @@ module.exports = {
   getAccount,
   getFactory,
   getFactoryAddress,
+  getExpectedChainId,
 };
