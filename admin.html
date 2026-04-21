@@ -85,9 +85,18 @@
   .toast.ok { background: rgba(34, 197, 94, 0.96); }
   .toast.err { background: rgba(239, 68, 68, 0.96); }
   .muted { color: var(--muted); }
+  .bot-card { display: grid; grid-template-columns: 1fr auto; gap: 12px; align-items: start; padding: 12px 0; border-bottom: 1px solid var(--border); }
+  .bot-card:last-child { border-bottom: none; }
+  .bot-meta { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 6px; }
+  .bot-name { font-weight: 700; font-size: 15px; }
+  .bot-actions { display: flex; gap: 8px; flex-wrap: wrap; justify-content: flex-end; }
+  .inline-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
   @media (max-width: 980px) {
     main { grid-template-columns: 1fr; }
     aside { border-right: none; border-bottom: 1px solid var(--border); }
+    .inline-grid { grid-template-columns: 1fr; }
+    .bot-card { grid-template-columns: 1fr; }
+    .bot-actions { justify-content: flex-start; }
   }
 </style>
 <script src="https://cdn.jsdelivr.net/npm/ethers@6.13.4/dist/ethers.umd.min.js"></script>
@@ -170,6 +179,7 @@
   <section>
     <div class="tabs">
       <button class="tab active" onclick="showTab('auctions', this)">Auctions</button>
+      <button class="tab" onclick="showTab('bots', this)">Bots</button>
       <button class="tab" onclick="showTab('winner', this)">Winner</button>
       <button class="tab" onclick="showTab('logs', this)">Logs</button>
     </div>
@@ -191,6 +201,49 @@
             <tr><td colspan="6" class="muted">Loading...</td></tr>
           </tbody>
         </table>
+      </div>
+    </div>
+
+    <div id="panel-bots" class="panel">
+      <div class="card" style="margin-bottom:14px">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
+          <h2 style="margin:0">Bot Network</h2>
+          <div class="btn-row">
+            <button class="success" onclick="startNetworkBots()">Start Enabled Bots</button>
+            <button class="danger" onclick="stopNetworkBots()">Stop All Bots</button>
+            <button onclick="loadBots()">Refresh</button>
+          </div>
+        </div>
+        <div id="botSummary" class="muted">Loading bots...</div>
+      </div>
+
+      <div class="card" style="margin-bottom:14px">
+        <h2>Add Or Edit Bot</h2>
+        <input id="botId" type="hidden" />
+        <div class="inline-grid">
+          <div class="field"><label>Name</label><input id="botName" placeholder="Bot Alpha" /></div>
+          <div class="field"><label>Private key</label><input id="botPrivateKey" placeholder="0x..." /></div>
+          <div class="field"><label>Cron</label><input id="botCron" placeholder="*/2 * * * *" /></div>
+          <div class="field"><label>Trading profile</label><select id="botTradingProfile"><option value="balanced">balanced</option><option value="conservative">conservative</option><option value="aggressive">aggressive</option></select></div>
+          <div class="field"><label>Max bid wei</label><input id="botMaxBid" type="number" min="0" /></div>
+          <div class="field"><label>Target active sell auctions</label><input id="botTargetAuctions" type="number" min="0" /></div>
+          <div class="field"><label>Max total sell auctions</label><input id="botMaxTotalAuctions" type="number" min="0" /></div>
+          <div class="field"><label>Generated auctions per cycle</label><input id="botGenerateCount" type="number" min="1" /></div>
+        </div>
+        <div class="toggle-row"><span>Bot enabled</span><input id="botEnabled" type="checkbox" checked /></div>
+        <div class="toggle-row"><span>Enable bidding</span><input id="botEnableBidding" type="checkbox" checked /></div>
+        <div class="toggle-row"><span>Enable selling</span><input id="botEnableSelling" type="checkbox" checked /></div>
+        <div class="toggle-row"><span>Enable finalize</span><input id="botEnableFinalize" type="checkbox" checked /></div>
+        <div class="toggle-row"><span>Auto-generate auctions</span><input id="botAutoGenerate" type="checkbox" checked /></div>
+        <div class="btn-row">
+          <button class="primary" onclick="saveBotProfile()">Save Bot</button>
+          <button onclick="resetBotForm()">Clear</button>
+        </div>
+      </div>
+
+      <div class="card">
+        <h2>Registered Bots</h2>
+        <div id="botList" class="muted">Loading bots...</div>
       </div>
     </div>
 
@@ -272,10 +325,12 @@ let browserProvider;
 let browserAccount = null;
 let lastEnableSellingState = false;
 let currentBotWallet = null;
+let botPoll;
 
 async function init() {
   await loadStatus();
   await loadAuctions();
+  await loadBots();
   startPolling();
 }
 
@@ -283,9 +338,11 @@ function startPolling() {
   clearInterval(statusPoll);
   clearInterval(logPoll);
   clearInterval(auctionPoll);
+  clearInterval(botPoll);
   statusPoll = setInterval(loadStatus, 10000);
   auctionPoll = setInterval(loadAuctions, 12000);
   logPoll = setInterval(loadLogs, 3000);
+  botPoll = setInterval(loadBots, 10000);
 }
 
 async function loadStatus() {
@@ -610,6 +667,154 @@ async function checkWinner() {
   `;
 }
 
+async function loadBots() {
+  const response = await get('/api/bots');
+  const bots = response.bots || [];
+  const running = bots.filter((bot) => bot.status === 'running').length;
+  document.getElementById('botSummary').textContent = `${bots.length} registered · ${running} running`;
+  const list = document.getElementById('botList');
+
+  if (!bots.length) {
+    list.innerHTML = '<div class="muted">No extra bots added yet.</div>';
+    return;
+  }
+
+  list.innerHTML = bots.map((bot) => {
+    const statePill = `<span class="pill ${bot.status === 'running' ? 'open' : 'closed'}">${escapeHtml(bot.status)}</span>`;
+    const enabledPill = `<span class="pill ${bot.enabled ? 'mine' : 'closed'}">${bot.enabled ? 'enabled' : 'disabled'}</span>`;
+    const wallet = bot.wallet ? `<div class="mono">${bot.wallet}</div>` : '';
+    const error = bot.lastError ? `<div class="mono" style="color:#fca5a5">${escapeHtml(bot.lastError)}</div>` : '';
+    const stats = bot.stats
+      ? `<div class="mono">cycles ${bot.stats.cycles || 0} · bids ${bot.stats.bids || 0} · created ${bot.stats.created || 0}</div>`
+      : '';
+    const logTail = (bot.logTail || []).slice(-2).map((line) => `<div class="mono">${escapeHtml(`[${line.level}] ${line.message}`)}</div>`).join('');
+    return `
+      <div class="bot-card">
+        <div>
+          <div class="bot-name">${escapeHtml(bot.name)}</div>
+          <div class="bot-meta">${statePill}${enabledPill}<span class="pill closed">${escapeHtml(bot.privateKeyMasked)}</span></div>
+          ${wallet}
+          ${stats}
+          ${bot.lastCycleAt ? `<div class="mono">last cycle ${new Date(bot.lastCycleAt).toLocaleString()}</div>` : ''}
+          ${error}
+          ${logTail}
+        </div>
+        <div class="bot-actions">
+          <button class="primary" onclick="editBot('${bot.id}')">Edit</button>
+          <button class="success" onclick="startBotProfile('${bot.id}')">Start</button>
+          <button onclick="runBotProfile('${bot.id}')">Run Once</button>
+          <button class="danger" onclick="stopBotProfile('${bot.id}')">Stop</button>
+          <button class="warning" onclick="deleteBotProfile('${bot.id}')">Delete</button>
+        </div>
+      </div>
+    `;
+  }).join('');
+
+  window.__botCache = bots;
+}
+
+function editBot(id) {
+  const bot = (window.__botCache || []).find((item) => item.id === id);
+  if (!bot) return;
+  document.getElementById('botId').value = bot.id;
+  document.getElementById('botName').value = bot.name || '';
+  document.getElementById('botPrivateKey').value = '';
+  document.getElementById('botCron').value = bot.overrides.AUTO_TRADE_CRON || '';
+  document.getElementById('botTradingProfile').value = bot.overrides.TRADING_PROFILE || 'balanced';
+  document.getElementById('botMaxBid').value = bot.overrides.MAX_BID_WEI || '';
+  document.getElementById('botTargetAuctions').value = bot.overrides.TARGET_ACTIVE_SELL_AUCTIONS || '';
+  document.getElementById('botMaxTotalAuctions').value = bot.overrides.MAX_TOTAL_SELL_AUCTIONS || '';
+  document.getElementById('botGenerateCount').value = bot.overrides.AUTO_GENERATE_COUNT || '';
+  document.getElementById('botEnabled').checked = bot.enabled !== false;
+  document.getElementById('botEnableBidding').checked = String(bot.overrides.ENABLE_BIDDING || 'true') !== 'false';
+  document.getElementById('botEnableSelling').checked = String(bot.overrides.ENABLE_SELLING || 'true') !== 'false';
+  document.getElementById('botEnableFinalize').checked = String(bot.overrides.ENABLE_FINALIZE || 'true') !== 'false';
+  document.getElementById('botAutoGenerate').checked = String(bot.overrides.AUTO_GENERATE_AUCTIONS || 'true') !== 'false';
+}
+
+function resetBotForm() {
+  document.getElementById('botId').value = '';
+  document.getElementById('botName').value = '';
+  document.getElementById('botPrivateKey').value = '';
+  document.getElementById('botCron').value = '';
+  document.getElementById('botTradingProfile').value = 'balanced';
+  document.getElementById('botMaxBid').value = '';
+  document.getElementById('botTargetAuctions').value = '';
+  document.getElementById('botMaxTotalAuctions').value = '';
+  document.getElementById('botGenerateCount').value = '';
+  document.getElementById('botEnabled').checked = true;
+  document.getElementById('botEnableBidding').checked = true;
+  document.getElementById('botEnableSelling').checked = true;
+  document.getElementById('botEnableFinalize').checked = true;
+  document.getElementById('botAutoGenerate').checked = true;
+}
+
+async function saveBotProfile() {
+  const payload = {
+    id: document.getElementById('botId').value || undefined,
+    name: document.getElementById('botName').value,
+    privateKey: document.getElementById('botPrivateKey').value || undefined,
+    enabled: document.getElementById('botEnabled').checked ? 'true' : 'false',
+    overrides: {
+      AUTO_TRADE_CRON: document.getElementById('botCron').value,
+      TRADING_PROFILE: document.getElementById('botTradingProfile').value,
+      MAX_BID_WEI: document.getElementById('botMaxBid').value,
+      TARGET_ACTIVE_SELL_AUCTIONS: document.getElementById('botTargetAuctions').value,
+      MAX_TOTAL_SELL_AUCTIONS: document.getElementById('botMaxTotalAuctions').value,
+      AUTO_GENERATE_COUNT: document.getElementById('botGenerateCount').value,
+      ENABLE_BIDDING: document.getElementById('botEnableBidding').checked ? 'true' : 'false',
+      ENABLE_SELLING: document.getElementById('botEnableSelling').checked ? 'true' : 'false',
+      ENABLE_FINALIZE: document.getElementById('botEnableFinalize').checked ? 'true' : 'false',
+      AUTO_GENERATE_AUCTIONS: document.getElementById('botAutoGenerate').checked ? 'true' : 'false',
+    }
+  };
+  const result = await post('/api/bots', payload);
+  if (result.ok) {
+    toast('Bot saved', 'ok');
+    resetBotForm();
+    loadBots();
+  } else {
+    toast(result.error || 'Failed to save bot', 'err');
+  }
+}
+
+async function startBotProfile(id) {
+  const result = await post('/api/bots/start', { id });
+  toast(result.ok ? 'Bot started' : (result.error || 'Start failed'), result.ok ? 'ok' : 'err');
+  loadBots();
+}
+
+async function stopBotProfile(id) {
+  const result = await post('/api/bots/stop', { id });
+  toast(result.ok ? 'Bot stopped' : (result.error || 'Stop failed'), result.ok ? 'ok' : 'err');
+  loadBots();
+}
+
+async function runBotProfile(id) {
+  const result = await post('/api/bots/run-once', { id });
+  toast(result.ok ? 'Bot cycle triggered' : (result.error || 'Run failed'), result.ok ? 'ok' : 'err');
+  loadBots();
+}
+
+async function deleteBotProfile(id) {
+  if (!confirm('Delete this bot profile?')) return;
+  const result = await post('/api/bots/delete', { id });
+  toast(result.ok ? 'Bot deleted' : (result.error || 'Delete failed'), result.ok ? 'ok' : 'err');
+  loadBots();
+}
+
+async function startNetworkBots() {
+  const result = await post('/api/bots/start-network', {});
+  toast(result.ok ? 'Enabled bots started' : (result.error || 'Network start failed'), result.ok ? 'ok' : 'err');
+  loadBots();
+}
+
+async function stopNetworkBots() {
+  const result = await post('/api/bots/stop-network', {});
+  toast(result.ok ? 'All bots stopped' : (result.error || 'Network stop failed'), result.ok ? 'ok' : 'err');
+  loadBots();
+}
+
 async function loadLogs() {
   if (!document.getElementById('panel-logs').classList.contains('active')) return;
   const logs = await get('/api/logs');
@@ -630,6 +835,7 @@ function showTab(name, button) {
   document.getElementById(`panel-${name}`).classList.add('active');
   if (name === 'logs') loadLogs();
   if (name === 'auctions') loadAuctions();
+  if (name === 'bots') loadBots();
 }
 
 async function get(url) {

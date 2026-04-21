@@ -9,6 +9,7 @@ const { processClosedAuctions } = require('./winner');
 const { getAccount, getWeb3, getFactory, getFactoryAddress, weiToEth, retryRpc, unwrapError, resyncNonce } = require('./chain');
 const { getRuntimeConfig, updateRuntimeConfig } = require('./config');
 const { startListening } = require('./listener');
+const { listBots, saveBot, deleteBot, startBot, stopBot, runBotOnce, startEnabledBots, stopAllBots } = require('./bot-network');
 
 const PORT = parseInt(process.env.ADMIN_PORT || '3002', 10);
 
@@ -131,11 +132,55 @@ async function handleApi(req, res, body, cors) {
     return json(res, getRuntimeConfig(), 200, cors);
   }
 
+  if (req.method === 'GET' && endpoint === '/api/bots') {
+    return json(res, { bots: listBots() }, 200, cors);
+  }
+
   if (req.method === 'POST' && endpoint === '/api/config') {
     const data = JSON.parse(body || '{}');
     const config = updateRuntimeConfig(data);
     logger.info('Operator config updated', config);
     return json(res, { ok: true, config }, 200, cors);
+  }
+
+  if (req.method === 'POST' && endpoint === '/api/bots') {
+    const payload = JSON.parse(body || '{}');
+    const bot = saveBot(payload);
+    return json(res, { ok: true, bot }, 200, cors);
+  }
+
+  if (req.method === 'POST' && endpoint === '/api/bots/delete') {
+    const { id } = JSON.parse(body || '{}');
+    await deleteBot(id);
+    return json(res, { ok: true }, 200, cors);
+  }
+
+  if (req.method === 'POST' && endpoint === '/api/bots/start') {
+    const { id } = JSON.parse(body || '{}');
+    const bot = await startBot(id);
+    return json(res, { ok: true, bot }, 200, cors);
+  }
+
+  if (req.method === 'POST' && endpoint === '/api/bots/stop') {
+    const { id } = JSON.parse(body || '{}');
+    await stopBot(id);
+    return json(res, { ok: true }, 200, cors);
+  }
+
+  if (req.method === 'POST' && endpoint === '/api/bots/run-once') {
+    const { id } = JSON.parse(body || '{}');
+    await runBotOnce(id);
+    return json(res, { ok: true }, 200, cors);
+  }
+
+  if (req.method === 'POST' && endpoint === '/api/bots/start-network') {
+    const bots = await startEnabledBots();
+    return json(res, { ok: true, bots }, 200, cors);
+  }
+
+  if (req.method === 'POST' && endpoint === '/api/bots/stop-network') {
+    await stopAllBots();
+    return json(res, { ok: true }, 200, cors);
   }
 
   if (req.method === 'POST' && endpoint === '/api/start') {
