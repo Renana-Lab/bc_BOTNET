@@ -9,7 +9,7 @@ const { processClosedAuctions } = require('./winner');
 const { getAccount, getWeb3, getFactory, getFactoryAddress, weiToEth, retryRpc, unwrapError, resyncNonce } = require('./chain');
 const { getRuntimeConfig, updateRuntimeConfig } = require('./config');
 const { startListening } = require('./listener');
-const { listBots, saveBot, deleteBot, startBot, stopBot, runBotOnce, startEnabledBots, stopAllBots } = require('./bot-network');
+const { getBotNetworkStatus, saveBot, deleteBot, startBot, stopBot, runBotOnce, startEnabledBots, stopAllBots, runSelectedBotsOnce, orchestrateBots } = require('./bot-network');
 
 const PORT = parseInt(process.env.ADMIN_PORT || '3002', 10);
 
@@ -133,7 +133,7 @@ async function handleApi(req, res, body, cors) {
   }
 
   if (req.method === 'GET' && endpoint === '/api/bots') {
-    return json(res, { bots: listBots() }, 200, cors);
+    return json(res, getBotNetworkStatus(), 200, cors);
   }
 
   if (req.method === 'POST' && endpoint === '/api/config') {
@@ -181,6 +181,35 @@ async function handleApi(req, res, body, cors) {
   if (req.method === 'POST' && endpoint === '/api/bots/stop-network') {
     await stopAllBots();
     return json(res, { ok: true }, 200, cors);
+  }
+
+  if (req.method === 'POST' && endpoint === '/api/bots/run-network') {
+    const { scope } = JSON.parse(body || '{}');
+    const result = await runSelectedBotsOnce(scope || 'running');
+    return json(res, result, 200, cors);
+  }
+
+  if (req.method === 'POST' && endpoint === '/api/bots/orchestrate') {
+    const payload = JSON.parse(body || '{}');
+    const result = await orchestrateBots(payload);
+    let primaryUpdated = false;
+
+    if (String(payload.includePrimary) === 'true') {
+      const primaryPatch = buildPrimaryOrchestrationPatch(payload.overrides || {});
+      if (Object.keys(primaryPatch).length > 0) {
+        updateRuntimeConfig(primaryPatch);
+        primaryUpdated = true;
+        logger.info('Primary bot config updated from botnet command center', primaryPatch);
+
+        if (payload.restartRunning === 'true' && botState.running && primaryPatch.AUTO_TRADE_CRON) {
+          stopAutoLoop();
+          startAutoLoop();
+        }
+      }
+    }
+
+    result.primaryUpdated = primaryUpdated;
+    return json(res, result, 200, cors);
   }
 
   if (req.method === 'POST' && endpoint === '/api/start') {
@@ -434,6 +463,33 @@ function serializeAuction(auction) {
     myBid: auction.myBid.toString(),
     closed: auction.closed,
   };
+}
+
+function buildPrimaryOrchestrationPatch(overrides = {}) {
+  const allowed = [
+    'AUTO_TRADE_CRON',
+    'TRADING_PROFILE',
+    'MAX_BID_WEI',
+    'OUTBID_BY_WEI',
+    'MAX_MIN_CONTRIBUTION_WEI',
+    'MIN_TIME_REMAINING_SEC',
+    'SKIP_IF_WINNING',
+    'ENABLE_BIDDING',
+    'ENABLE_SELLING',
+    'ENABLE_FINALIZE',
+    'AUTO_GENERATE_AUCTIONS',
+    'AUTO_GENERATE_COUNT',
+    'TARGET_ACTIVE_SELL_AUCTIONS',
+    'MAX_TOTAL_SELL_AUCTIONS',
+  ];
+  const patch = {};
+  for (const key of allowed) {
+    const value = overrides[key];
+    if (value !== undefined && value !== null && value !== '') {
+      patch[key] = String(value);
+    }
+  }
+  return patch;
 }
 
 function startAdminServer() {

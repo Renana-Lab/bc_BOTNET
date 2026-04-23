@@ -359,3 +359,6 @@
 {"error":"invalid chain ID","level":"error","message":"Failed to create generated auction \"Fresh browsing-intent segments for high-spend crypto consumers | Consumer intelligence feed\"","timestamp":"2026-04-21 12:09:37"}
 {"error":"Returned error: ","level":"error","message":"Failed to create generated auction \"Wallet engagement clusters with purchase-intent scoring | Wallet behavior bundle\"","timestamp":"2026-04-21 12:12:48"}
 {"error":"Returned error:","level":"error","message":"Failed to create generated auction \"Fresh browsing-intent segments for high-spend crypto consumers | Consumer intelligence feed\"","timestamp":"2026-04-21 12:12:55"}
+{"error":"execution reverted: Insufficient budget","level":"error","message":"Exploratory bid failed on 0x1a8363B816EaF1b3EcAA8b5EDD2C4Bd1F622AE02","timestamp":"2026-04-23 13:18:28"}
+{"error":"execution reverted: Insufficient budget","level":"error","message":"Exploratory bid failed on 0x1a8363B816EaF1b3EcAA8b5EDD2C4Bd1F622AE02","timestamp":"2026-04-23 13:20:26"}
+{"error":"execution reverted: Insufficient budget","level":"error","message":"Exploratory bid failed on 0x1a8363B816EaF1b3EcAA8b5EDD2C4Bd1F622AE02","timestamp":"2026-04-23 13:22:27"}

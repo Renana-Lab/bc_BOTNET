@@ -15,6 +15,11 @@ function listBots() {
   return bots.map((bot) => serializeBot(bot));
 }
 
+function getBotNetworkStatus() {
+  const bots = listBots();
+  return { bots, summary: summarizeBots(bots) };
+}
+
 function getBot(id) {
   return readBots().find((bot) => bot.id === id) || null;
 }
@@ -144,6 +149,79 @@ async function stopAllBots() {
   return { ok: true };
 }
 
+async function runSelectedBotsOnce(scope = 'running') {
+  const targets = selectBotsByScope(readBots(), scope);
+  let triggered = 0;
+  let skipped = 0;
+
+  for (const bot of targets) {
+    const state = runtime.get(bot.id);
+    if (!state?.child || state.child.killed) {
+      skipped += 1;
+      continue;
+    }
+    state.child.send({ type: 'run-once' });
+    triggered += 1;
+  }
+
+  return { ok: true, triggered, skipped };
+}
+
+async function orchestrateBots(input = {}) {
+  const scope = input.scope || 'all';
+  const restartRunning = String(input.restartRunning) === 'true';
+  const patchEnabled = input.enabled === undefined || input.enabled === null || input.enabled === ''
+    ? undefined
+    : normalizeBool(input.enabled, true);
+  const patchOverrides = sanitizeBroadcastOverrides(input.overrides || {});
+
+  const bots = readBots();
+  const targets = selectBotsByScope(bots, scope);
+  const targetIds = new Set(targets.map((bot) => bot.id));
+  const runningIds = targets
+    .filter((bot) => {
+      const state = runtime.get(bot.id);
+      return state?.child && !state.child.killed;
+    })
+    .map((bot) => bot.id);
+
+  for (const bot of bots) {
+    if (!targetIds.has(bot.id)) continue;
+    if (patchEnabled !== undefined) {
+      bot.enabled = patchEnabled;
+    }
+    if (Object.keys(patchOverrides).length > 0) {
+      bot.overrides = {
+        ...(bot.overrides || {}),
+        ...patchOverrides,
+      };
+    }
+    bot.updatedAt = new Date().toISOString();
+  }
+
+  writeBots(bots);
+
+  let restarted = 0;
+  if (restartRunning) {
+    for (const id of runningIds) {
+      await stopBot(id);
+      const nextBot = getBot(id);
+      if (nextBot?.enabled !== false) {
+        await startBot(id);
+        restarted += 1;
+      }
+    }
+  }
+
+  const status = getBotNetworkStatus();
+  return {
+    ok: true,
+    updated: targets.length,
+    restarted,
+    ...status,
+  };
+}
+
 function serializeBot(bot) {
   const state = runtime.get(bot.id) || {};
   return {
@@ -259,6 +337,16 @@ function sanitizeOverrides(input = {}) {
   return out;
 }
 
+function sanitizeBroadcastOverrides(input = {}) {
+  const out = {};
+  const allowed = sanitizeOverrides(input);
+  for (const [key, value] of Object.entries(allowed)) {
+    if (value === undefined || value === null || value === '') continue;
+    out[key] = value;
+  }
+  return out;
+}
+
 function readBots() {
   ensureStore();
   try {
@@ -327,7 +415,52 @@ function bindCleanup() {
   });
 }
 
+function selectBotsByScope(bots, scope = 'all') {
+  switch (scope) {
+    case 'enabled':
+      return bots.filter((bot) => bot.enabled);
+    case 'running':
+      return bots.filter((bot) => {
+        const state = runtime.get(bot.id);
+        return state?.child && !state.child.killed;
+      });
+    case 'all':
+    default:
+      return bots;
+  }
+}
+
+function summarizeBots(bots = []) {
+  const summary = {
+    registered: bots.length,
+    enabled: 0,
+    running: 0,
+    crashed: 0,
+    ready: 0,
+    idle: 0,
+    bids: 0,
+    created: 0,
+    finalized: 0,
+    errors: 0,
+  };
+
+  for (const bot of bots) {
+    if (bot.enabled) summary.enabled += 1;
+    if (bot.status === 'running') summary.running += 1;
+    if (bot.status === 'crashed') summary.crashed += 1;
+    if (bot.status === 'ready') summary.ready += 1;
+    if (bot.status === 'idle') summary.idle += 1;
+    summary.bids += Number(bot.stats?.bids || 0);
+    summary.created += Number(bot.stats?.created || 0);
+    summary.finalized += Number(bot.stats?.finalized || 0);
+    summary.errors += Number(bot.stats?.errors || 0);
+  }
+
+  return summary;
+}
+
 module.exports = {
+  getBotNetworkStatus,
   listBots,
   saveBot,
   deleteBot,
@@ -336,4 +469,6 @@ module.exports = {
   runBotOnce,
   startEnabledBots,
   stopAllBots,
+  runSelectedBotsOnce,
+  orchestrateBots,
 };

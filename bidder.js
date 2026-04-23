@@ -133,6 +133,12 @@ function shouldBid(auction, myBudget, strategy, mode = 'normal') {
     return { bid: false, reason: `Too little time left (${auction.secondsLeft}s)` };
   }
   if (auction.isManager) return { bid: false, reason: 'You are the seller' };
+  if (auction.amIBidding && auction.myBid > 0n) {
+    const alreadyLeading = auction.highestBid <= auction.myBid;
+    if (alreadyLeading && !hasCompetition(auction)) {
+      return { bid: false, reason: 'Already leading without competition' };
+    }
+  }
   if (strategy.SKIP_IF_WINNING && auction.amIWinning) {
     return { bid: false, reason: 'Already winning' };
   }
@@ -206,6 +212,18 @@ async function finalizeAuction(auctionAddress) {
 
 function sleep(ms) {
   return new Promise((resolve) => setTimeout(resolve, ms));
+}
+
+function hasCompetition(auction) {
+  const bidderAddresses = Array.isArray(auction.bidderAddresses)
+    ? [...new Set(auction.bidderAddresses.map((address) => String(address).toLowerCase()).filter(Boolean))]
+    : [];
+
+  if (bidderAddresses.length > 0) {
+    return auction.amIBidding ? bidderAddresses.length > 1 : bidderAddresses.length > 0;
+  }
+
+  return Number(auction.approversCount || 0) > (auction.amIBidding ? 1 : 0);
 }
 
 function pickExploratoryBid(skipped, walletBalance, strategy) {

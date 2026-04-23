@@ -1,1 +1,22 @@
-[]
+[
+  {
+    "id": "bot-b-ax0pz7",
+    "name": "Bot B",
+    "privateKey": "0xb01d890e1b66d5aa14434070f4d49c4bdb6884af4ac8b8ffae84c660988f6182",
+    "enabled": true,
+    "overrides": {
+      "AUTO_TRADE_CRON": "*/2 * * * *",
+      "TRADING_PROFILE": "balanced",
+      "MAX_BID_WEI": "",
+      "ENABLE_BIDDING": "true",
+      "ENABLE_SELLING": "true",
+      "ENABLE_FINALIZE": "true",
+      "AUTO_GENERATE_AUCTIONS": "true",
+      "AUTO_GENERATE_COUNT": "",
+      "TARGET_ACTIVE_SELL_AUCTIONS": "",
+      "MAX_TOTAL_SELL_AUCTIONS": ""
+    },
+    "createdAt": "2026-04-23T11:06:11.448Z",
+    "updatedAt": "2026-04-23T11:06:11.448Z"
+  }
+]

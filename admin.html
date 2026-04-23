@@ -91,12 +91,16 @@
   .bot-name { font-weight: 700; font-size: 15px; }
   .bot-actions { display: flex; gap: 8px; flex-wrap: wrap; justify-content: flex-end; }
   .inline-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
+  .schedule-builder { display: grid; gap: 8px; }
+  .schedule-row { display: grid; grid-template-columns: minmax(0, 1.4fr) minmax(90px, 0.8fr) minmax(0, 1fr); gap: 8px; }
+  .schedule-preview { font-size: 12px; }
   @media (max-width: 980px) {
     main { grid-template-columns: 1fr; }
     aside { border-right: none; border-bottom: 1px solid var(--border); }
     .inline-grid { grid-template-columns: 1fr; }
     .bot-card { grid-template-columns: 1fr; }
     .bot-actions { justify-content: flex-start; }
+    .schedule-row { grid-template-columns: 1fr; }
   }
 </style>
 <script src="https://cdn.jsdelivr.net/npm/ethers@6.13.4/dist/ethers.umd.min.js"></script>
@@ -131,8 +135,23 @@
           <button onclick="runOnce()">Run Once</button>
         </div>
         <div class="field">
-          <label>Cron</label>
-          <input id="cfgCron" placeholder="*/2 * * * *" />
+          <label>Schedule</label>
+          <div class="schedule-builder">
+            <div class="schedule-row">
+              <select id="cfgScheduleMode" onchange="updateScheduleBuilder('cfg')">
+                <option value="minutes">Every N minutes</option>
+                <option value="hours">Every N hours</option>
+                <option value="daily">Daily at time</option>
+                <option value="weekdays">Weekdays at time</option>
+                <option value="custom">Advanced cron</option>
+              </select>
+              <input id="cfgScheduleValue" type="number" min="1" value="2" onchange="updateScheduleBuilder('cfg')" />
+              <input id="cfgScheduleTime" type="time" value="09:00" onchange="updateScheduleBuilder('cfg')" />
+            </div>
+            <input id="cfgScheduleCustom" placeholder="*/2 * * * *" onchange="updateScheduleBuilder('cfg')" />
+            <div id="cfgSchedulePreview" class="mono schedule-preview">Every 2 minutes</div>
+            <input id="cfgCron" type="hidden" />
+          </div>
         </div>
         <div class="toggle-row"><span>Enable bidding</span><input id="cfgEnableBidding" type="checkbox" onchange="queueSaveConfig()" /></div>
         <div class="toggle-row"><span>Enable selling</span><input id="cfgEnableSelling" type="checkbox" onchange="queueSaveConfig()" /></div>
@@ -152,14 +171,11 @@
         </div>
         <div class="mono" id="lastCycle" style="margin-top:10px">Last cycle: never</div>
         <div class="card" style="margin-top:12px;background:#121b2d">
-          <h2>Cron Help</h2>
+          <h2>Schedule Help</h2>
           <div class="muted" style="font-size:13px;line-height:1.6">
-            Cron is the schedule that tells the bot when to wake up and run a trading cycle.
-            Use five fields: <span class="mono">minute hour day month weekday</span>.
-            Examples:
-            <div class="mono" style="margin-top:8px">*/2 * * * *  = every 2 minutes</div>
-            <div class="mono">0 * * * *    = every hour</div>
-            <div class="mono">0 9 * * 1-5  = weekdays at 09:00</div>
+            Use the selector to choose how often the bot wakes up.
+            The smallest interval is 1 minute, and each bot can have its own separate schedule.
+            Advanced cron is still available if you need something unusual.
           </div>
         </div>
       </div>
@@ -211,10 +227,109 @@
           <div class="btn-row">
             <button class="success" onclick="startNetworkBots()">Start Enabled Bots</button>
             <button class="danger" onclick="stopNetworkBots()">Stop All Bots</button>
+            <button onclick="runNetworkBots()">Run Running Bots</button>
             <button onclick="loadBots()">Refresh</button>
           </div>
         </div>
         <div id="botSummary" class="muted">Loading bots...</div>
+      </div>
+
+      <div class="card" style="margin-bottom:14px">
+        <h2>Botnet Command Center</h2>
+        <div class="muted" style="margin-bottom:10px">Broadcast one policy to many registered bots at once. Leave a field blank to keep each bot's current value.</div>
+        <div class="inline-grid">
+          <div class="field">
+            <label>Target bots</label>
+            <select id="netScope">
+              <option value="all">All registered bots</option>
+              <option value="enabled">Enabled bots only</option>
+              <option value="running">Running bots only</option>
+            </select>
+          </div>
+          <div class="field">
+            <label>Trading profile</label>
+            <select id="netTradingProfile">
+              <option value="">No change</option>
+              <option value="balanced">balanced</option>
+              <option value="conservative">conservative</option>
+              <option value="aggressive">aggressive</option>
+            </select>
+          </div>
+          <div class="field">
+            <label>Schedule</label>
+            <div class="schedule-builder">
+              <div class="schedule-row">
+                <select id="netScheduleMode" onchange="updateScheduleBuilder('net')">
+                  <option value="">No change</option>
+                  <option value="minutes">Every N minutes</option>
+                  <option value="hours">Every N hours</option>
+                  <option value="daily">Daily at time</option>
+                  <option value="weekdays">Weekdays at time</option>
+                  <option value="custom">Advanced cron</option>
+                </select>
+                <input id="netScheduleValue" type="number" min="1" value="2" onchange="updateScheduleBuilder('net')" />
+                <input id="netScheduleTime" type="time" value="09:00" onchange="updateScheduleBuilder('net')" />
+              </div>
+              <input id="netScheduleCustom" placeholder="Leave blank to keep current" onchange="updateScheduleBuilder('net')" />
+              <div id="netSchedulePreview" class="mono schedule-preview">No change</div>
+              <input id="netCron" type="hidden" />
+            </div>
+          </div>
+          <div class="field"><label>Max bid wei</label><input id="netMaxBid" type="number" min="0" placeholder="Leave blank" /></div>
+          <div class="field"><label>Outbid by wei</label><input id="netOutbid" type="number" min="0" placeholder="Leave blank" /></div>
+          <div class="field"><label>Target active sell auctions</label><input id="netTargetActive" type="number" min="0" placeholder="Leave blank" /></div>
+          <div class="field"><label>Max total sell auctions</label><input id="netMaxTotal" type="number" min="0" placeholder="Leave blank" /></div>
+          <div class="field"><label>Generated auctions per cycle</label><input id="netGenerateCount" type="number" min="1" placeholder="Leave blank" /></div>
+          <div class="field">
+            <label>Bot enabled</label>
+            <select id="netEnabled">
+              <option value="">No change</option>
+              <option value="true">Enable</option>
+              <option value="false">Disable</option>
+            </select>
+          </div>
+          <div class="field">
+            <label>Bidding</label>
+            <select id="netEnableBidding">
+              <option value="">No change</option>
+              <option value="true">On</option>
+              <option value="false">Off</option>
+            </select>
+          </div>
+          <div class="field">
+            <label>Selling</label>
+            <select id="netEnableSelling">
+              <option value="">No change</option>
+              <option value="true">On</option>
+              <option value="false">Off</option>
+            </select>
+          </div>
+          <div class="field">
+            <label>Finalize</label>
+            <select id="netEnableFinalize">
+              <option value="">No change</option>
+              <option value="true">On</option>
+              <option value="false">Off</option>
+            </select>
+          </div>
+          <div class="field">
+            <label>Auto-generate auctions</label>
+            <select id="netAutoGenerate">
+              <option value="">No change</option>
+              <option value="true">On</option>
+              <option value="false">Off</option>
+            </select>
+          </div>
+        </div>
+        <div class="toggle-row"><span>Restart running bots after apply</span><input id="netRestartRunning" type="checkbox" checked /></div>
+        <div class="toggle-row"><span>Include primary controller bot</span><input id="netIncludePrimary" type="checkbox" /></div>
+        <div class="btn-row">
+          <button class="primary" onclick="applyNetworkPolicy()">Apply To Botnet</button>
+          <button class="warning" onclick="applyNetworkPreset('pause-bidding')">Pause Bidding</button>
+          <button class="success" onclick="applyNetworkPreset('buy-wave')">Buy Wave</button>
+          <button class="success" onclick="applyNetworkPreset('sell-wave')">Sell Wave</button>
+          <button onclick="resetNetworkCommandForm()">Clear Command</button>
+        </div>
       </div>
 
       <div class="card" style="margin-bottom:14px">
@@ -223,7 +338,25 @@
         <div class="inline-grid">
           <div class="field"><label>Name</label><input id="botName" placeholder="Bot Alpha" /></div>
           <div class="field"><label>Private key</label><input id="botPrivateKey" placeholder="0x..." /></div>
-          <div class="field"><label>Cron</label><input id="botCron" placeholder="*/2 * * * *" /></div>
+          <div class="field">
+            <label>Schedule</label>
+            <div class="schedule-builder">
+              <div class="schedule-row">
+                <select id="botScheduleMode" onchange="updateScheduleBuilder('bot')">
+                  <option value="minutes">Every N minutes</option>
+                  <option value="hours">Every N hours</option>
+                  <option value="daily">Daily at time</option>
+                  <option value="weekdays">Weekdays at time</option>
+                  <option value="custom">Advanced cron</option>
+                </select>
+                <input id="botScheduleValue" type="number" min="1" value="2" onchange="updateScheduleBuilder('bot')" />
+                <input id="botScheduleTime" type="time" value="09:00" onchange="updateScheduleBuilder('bot')" />
+              </div>
+              <input id="botScheduleCustom" placeholder="*/2 * * * *" onchange="updateScheduleBuilder('bot')" />
+              <div id="botSchedulePreview" class="mono schedule-preview">Every 2 minutes</div>
+              <input id="botCron" type="hidden" />
+            </div>
+          </div>
           <div class="field"><label>Trading profile</label><select id="botTradingProfile"><option value="balanced">balanced</option><option value="conservative">conservative</option><option value="aggressive">aggressive</option></select></div>
           <div class="field"><label>Max bid wei</label><input id="botMaxBid" type="number" min="0" /></div>
           <div class="field"><label>Target active sell auctions</label><input id="botTargetAuctions" type="number" min="0" /></div>
@@ -328,6 +461,7 @@ let currentBotWallet = null;
 let botPoll;
 
 async function init() {
+  initializeScheduleBuilders();
   await loadStatus();
   await loadAuctions();
   await loadBots();
@@ -343,6 +477,160 @@ function startPolling() {
   auctionPoll = setInterval(loadAuctions, 12000);
   logPoll = setInterval(loadLogs, 3000);
   botPoll = setInterval(loadBots, 10000);
+}
+
+function initializeScheduleBuilders() {
+  syncScheduleBuilderFromCron('cfg', '*/2 * * * *');
+  syncScheduleBuilderFromCron('bot', '*/2 * * * *');
+  syncScheduleBuilderFromCron('net', '');
+}
+
+function updateScheduleBuilder(prefix) {
+  const mode = document.getElementById(`${prefix}ScheduleMode`).value;
+  const valueEl = document.getElementById(`${prefix}ScheduleValue`);
+  const timeEl = document.getElementById(`${prefix}ScheduleTime`);
+  const customEl = document.getElementById(`${prefix}ScheduleCustom`);
+  const previewEl = document.getElementById(`${prefix}SchedulePreview`);
+  const cronEl = document.getElementById(`${prefix}Cron`);
+
+  const usesValue = mode === 'minutes' || mode === 'hours';
+  const usesTime = mode === 'daily' || mode === 'weekdays';
+  const usesCustom = mode === 'custom';
+
+  valueEl.style.display = usesValue ? '' : 'none';
+  timeEl.style.display = usesTime ? '' : 'none';
+  customEl.style.display = usesCustom ? '' : 'none';
+
+  const cron = buildCronFromBuilder(prefix, mode);
+  cronEl.value = cron;
+  previewEl.textContent = describeSchedule(mode, cron, prefix);
+}
+
+function syncScheduleBuilderFromCron(prefix, cron) {
+  const parsed = parseCronToBuilder(cron, prefix === 'net');
+  document.getElementById(`${prefix}ScheduleMode`).value = parsed.mode;
+  document.getElementById(`${prefix}ScheduleValue`).value = parsed.value;
+  document.getElementById(`${prefix}ScheduleTime`).value = parsed.time;
+  document.getElementById(`${prefix}ScheduleCustom`).value = parsed.custom;
+  document.getElementById(`${prefix}Cron`).value = parsed.cron;
+  updateScheduleBuilder(prefix);
+}
+
+function buildCronFromBuilder(prefix, mode) {
+  const allowBlank = prefix === 'net';
+  const value = Math.max(1, Number(document.getElementById(`${prefix}ScheduleValue`).value || '1'));
+  const time = document.getElementById(`${prefix}ScheduleTime`).value || '09:00';
+  const [hourText, minuteText] = time.split(':');
+  const hour = Number(hourText || '9');
+  const minute = Number(minuteText || '0');
+  const custom = String(document.getElementById(`${prefix}ScheduleCustom`).value || '').trim();
+
+  if (allowBlank && !mode) {
+    return '';
+  }
+
+  if (mode === 'minutes') {
+    return value <= 1 ? '* * * * *' : `*/${Math.min(value, 59)} * * * *`;
+  }
+  if (mode === 'hours') {
+    return value <= 1 ? `0 * * * *` : `0 */${Math.min(value, 23)} * * *`;
+  }
+  if (mode === 'daily') {
+    return `${minute} ${hour} * * *`;
+  }
+  if (mode === 'weekdays') {
+    return `${minute} ${hour} * * 1-5`;
+  }
+  if (mode === 'custom') {
+    return custom;
+  }
+
+  return allowBlank ? '' : '* * * * *';
+}
+
+function parseCronToBuilder(cron, allowBlank = false) {
+  const raw = String(cron || '').trim();
+  const fallback = {
+    mode: allowBlank ? '' : 'minutes',
+    value: '2',
+    time: '09:00',
+    custom: '',
+    cron: allowBlank ? '' : '*/2 * * * *',
+  };
+
+  if (!raw) {
+    return fallback;
+  }
+
+  let match = raw.match(/^\*\/(\d+) \* \* \* \*$/);
+  if (match) {
+    return { mode: 'minutes', value: match[1], time: '09:00', custom: '', cron: raw };
+  }
+  if (raw === '* * * * *') {
+    return { mode: 'minutes', value: '1', time: '09:00', custom: '', cron: raw };
+  }
+
+  match = raw.match(/^0 \*\/(\d+) \* \* \*$/);
+  if (match) {
+    return { mode: 'hours', value: match[1], time: '09:00', custom: '', cron: raw };
+  }
+  if (raw === '0 * * * *') {
+    return { mode: 'hours', value: '1', time: '09:00', custom: '', cron: raw };
+  }
+
+  match = raw.match(/^(\d{1,2}) (\d{1,2}) \* \* 1-5$/);
+  if (match) {
+    return {
+      mode: 'weekdays',
+      value: '1',
+      time: `${String(match[2]).padStart(2, '0')}:${String(match[1]).padStart(2, '0')}`,
+      custom: '',
+      cron: raw,
+    };
+  }
+
+  match = raw.match(/^(\d{1,2}) (\d{1,2}) \* \* \*$/);
+  if (match) {
+    return {
+      mode: 'daily',
+      value: '1',
+      time: `${String(match[2]).padStart(2, '0')}:${String(match[1]).padStart(2, '0')}`,
+      custom: '',
+      cron: raw,
+    };
+  }
+
+  return {
+    mode: 'custom',
+    value: '2',
+    time: '09:00',
+    custom: raw,
+    cron: raw,
+  };
+}
+
+function describeSchedule(mode, cron, prefix) {
+  if (!cron) {
+    return prefix === 'net' ? 'No schedule change' : 'Pick a schedule';
+  }
+  if (mode === 'minutes') {
+    const value = Number(document.getElementById(`${prefix}ScheduleValue`).value || '1');
+    return `Every ${value} minute${value === 1 ? '' : 's'}`;
+  }
+  if (mode === 'hours') {
+    const value = Number(document.getElementById(`${prefix}ScheduleValue`).value || '1');
+    return `Every ${value} hour${value === 1 ? '' : 's'}`;
+  }
+  if (mode === 'daily') {
+    return `Daily at ${document.getElementById(`${prefix}ScheduleTime`).value || '09:00'}`;
+  }
+  if (mode === 'weekdays') {
+    return `Weekdays at ${document.getElementById(`${prefix}ScheduleTime`).value || '09:00'}`;
+  }
+  if (mode === 'custom') {
+    return `Advanced cron: ${cron}`;
+  }
+  return cron;
 }
 
 async function loadStatus() {
@@ -371,7 +659,9 @@ async function loadStatus() {
 }
 
 function syncConfig(config) {
-  setValue('cfgCron', config.AUTO_TRADE_CRON);
+  if (!isScheduleBuilderActive('cfg')) {
+    syncScheduleBuilderFromCron('cfg', config.AUTO_TRADE_CRON);
+  }
   setValue('cfgMaxBid', config.MAX_BID_WEI);
   setValue('cfgOutbid', config.OUTBID_BY_WEI);
   setValue('cfgMaxMin', config.MAX_MIN_CONTRIBUTION_WEI);
@@ -457,6 +747,7 @@ function renderAuctions(auctions) {
 
 async function saveConfig() {
   if (isSavingConfig) return;
+  updateScheduleBuilder('cfg');
   const enableSellingNow = document.getElementById('cfgEnableSelling').checked;
   const justEnabledSelling = !lastEnableSellingState && enableSellingNow;
   const payload = {
@@ -670,8 +961,15 @@ async function checkWinner() {
 async function loadBots() {
   const response = await get('/api/bots');
   const bots = response.bots || [];
-  const running = bots.filter((bot) => bot.status === 'running').length;
-  document.getElementById('botSummary').textContent = `${bots.length} registered · ${running} running`;
+  const summary = response.summary || {};
+  document.getElementById('botSummary').textContent = [
+    `${summary.registered ?? bots.length} registered`,
+    `${summary.enabled ?? bots.filter((bot) => bot.enabled).length} enabled`,
+    `${summary.running ?? bots.filter((bot) => bot.status === 'running').length} running`,
+    `bids ${summary.bids ?? 0}`,
+    `created ${summary.created ?? 0}`,
+    `errors ${summary.errors ?? 0}`,
+  ].join(' · ');
   const list = document.getElementById('botList');
 
   if (!bots.length) {
@@ -713,13 +1011,101 @@ async function loadBots() {
   window.__botCache = bots;
 }
 
+function resetNetworkCommandForm() {
+  document.getElementById('netScope').value = 'all';
+  document.getElementById('netTradingProfile').value = '';
+  syncScheduleBuilderFromCron('net', '');
+  document.getElementById('netMaxBid').value = '';
+  document.getElementById('netOutbid').value = '';
+  document.getElementById('netTargetActive').value = '';
+  document.getElementById('netMaxTotal').value = '';
+  document.getElementById('netGenerateCount').value = '';
+  document.getElementById('netEnabled').value = '';
+  document.getElementById('netEnableBidding').value = '';
+  document.getElementById('netEnableSelling').value = '';
+  document.getElementById('netEnableFinalize').value = '';
+  document.getElementById('netAutoGenerate').value = '';
+  document.getElementById('netRestartRunning').checked = true;
+  document.getElementById('netIncludePrimary').checked = false;
+}
+
+async function applyNetworkPolicy(custom = null) {
+  updateScheduleBuilder('net');
+  const payload = custom || {
+    scope: document.getElementById('netScope').value,
+    restartRunning: document.getElementById('netRestartRunning').checked ? 'true' : 'false',
+    includePrimary: document.getElementById('netIncludePrimary').checked ? 'true' : 'false',
+    enabled: selectOptionalValue('netEnabled'),
+    overrides: {
+      AUTO_TRADE_CRON: selectOptionalValue('netCron'),
+      TRADING_PROFILE: selectOptionalValue('netTradingProfile'),
+      MAX_BID_WEI: selectOptionalValue('netMaxBid'),
+      OUTBID_BY_WEI: selectOptionalValue('netOutbid'),
+      TARGET_ACTIVE_SELL_AUCTIONS: selectOptionalValue('netTargetActive'),
+      MAX_TOTAL_SELL_AUCTIONS: selectOptionalValue('netMaxTotal'),
+      AUTO_GENERATE_COUNT: selectOptionalValue('netGenerateCount'),
+      ENABLE_BIDDING: selectOptionalValue('netEnableBidding'),
+      ENABLE_SELLING: selectOptionalValue('netEnableSelling'),
+      ENABLE_FINALIZE: selectOptionalValue('netEnableFinalize'),
+      AUTO_GENERATE_AUCTIONS: selectOptionalValue('netAutoGenerate'),
+    }
+  };
+
+  const result = await post('/api/bots/orchestrate', payload);
+  if (result.ok) {
+    const primaryNote = result.primaryUpdated ? ', primary updated' : '';
+    toast(`Updated ${result.updated} bot(s)${result.restarted ? `, restarted ${result.restarted}` : ''}${primaryNote}`, 'ok');
+  } else {
+    toast(result.error || 'Broadcast failed', 'err');
+  }
+  loadBots();
+}
+
+async function applyNetworkPreset(name) {
+  const scope = document.getElementById('netScope').value;
+  const restartRunning = document.getElementById('netRestartRunning').checked ? 'true' : 'false';
+  const includePrimary = document.getElementById('netIncludePrimary').checked ? 'true' : 'false';
+  const presets = {
+    'pause-bidding': {
+      scope,
+      restartRunning,
+      includePrimary,
+      overrides: { ENABLE_BIDDING: 'false' },
+    },
+    'buy-wave': {
+      scope,
+      restartRunning,
+      includePrimary,
+      overrides: {
+        ENABLE_BIDDING: 'true',
+        ENABLE_SELLING: 'false',
+        ENABLE_FINALIZE: 'true',
+      },
+    },
+    'sell-wave': {
+      scope,
+      restartRunning,
+      includePrimary,
+      overrides: {
+        ENABLE_BIDDING: 'false',
+        ENABLE_SELLING: 'true',
+        ENABLE_FINALIZE: 'true',
+      },
+    },
+  };
+
+  const payload = presets[name];
+  if (!payload) return;
+  await applyNetworkPolicy(payload);
+}
+
 function editBot(id) {
   const bot = (window.__botCache || []).find((item) => item.id === id);
   if (!bot) return;
   document.getElementById('botId').value = bot.id;
   document.getElementById('botName').value = bot.name || '';
   document.getElementById('botPrivateKey').value = '';
-  document.getElementById('botCron').value = bot.overrides.AUTO_TRADE_CRON || '';
+  syncScheduleBuilderFromCron('bot', bot.overrides.AUTO_TRADE_CRON || '');
   document.getElementById('botTradingProfile').value = bot.overrides.TRADING_PROFILE || 'balanced';
   document.getElementById('botMaxBid').value = bot.overrides.MAX_BID_WEI || '';
   document.getElementById('botTargetAuctions').value = bot.overrides.TARGET_ACTIVE_SELL_AUCTIONS || '';
@@ -736,7 +1122,7 @@ function resetBotForm() {
   document.getElementById('botId').value = '';
   document.getElementById('botName').value = '';
   document.getElementById('botPrivateKey').value = '';
-  document.getElementById('botCron').value = '';
+  syncScheduleBuilderFromCron('bot', '*/2 * * * *');
   document.getElementById('botTradingProfile').value = 'balanced';
   document.getElementById('botMaxBid').value = '';
   document.getElementById('botTargetAuctions').value = '';
@@ -750,6 +1136,7 @@ function resetBotForm() {
 }
 
 async function saveBotProfile() {
+  updateScheduleBuilder('bot');
   const payload = {
     id: document.getElementById('botId').value || undefined,
     name: document.getElementById('botName').value,
@@ -812,6 +1199,16 @@ async function startNetworkBots() {
 async function stopNetworkBots() {
   const result = await post('/api/bots/stop-network', {});
   toast(result.ok ? 'All bots stopped' : (result.error || 'Network stop failed'), result.ok ? 'ok' : 'err');
+  loadBots();
+}
+
+async function runNetworkBots(scope = 'running') {
+  const result = await post('/api/bots/run-network', { scope });
+  if (result.ok) {
+    toast(`Triggered ${result.triggered} bot(s)${result.skipped ? `, skipped ${result.skipped}` : ''}`, 'ok');
+  } else {
+    toast(result.error || 'Network run failed', 'err');
+  }
   loadBots();
 }
 
@@ -896,6 +1293,18 @@ function setValue(id, value) {
 function setChecked(id, value) {
   const el = document.getElementById(id);
   if (el) el.checked = String(value) === 'true';
+}
+
+function selectOptionalValue(id) {
+  const el = document.getElementById(id);
+  if (!el) return undefined;
+  const value = String(el.value ?? '').trim();
+  return value ? value : undefined;
+}
+
+function isScheduleBuilderActive(prefix) {
+  const activeId = document.activeElement?.id || '';
+  return activeId.startsWith(`${prefix}Schedule`);
 }
 
 function escapeHtml(value) {

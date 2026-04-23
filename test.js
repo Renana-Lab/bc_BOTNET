@@ -28,6 +28,7 @@ function auction(overrides = {}) {
     minimumContribution: 500n,
     highestBid: 0n,
     approversCount: 0,
+    bidderAddresses: [],
     closed: false,
     ...overrides,
   };
@@ -57,11 +58,54 @@ test('outbids current highest', () => {
 
 test('sends only increment when already bidding', () => {
   const result = shouldBid(
-    auction({ approversCount: 2, highestBid: 1500n, minimumContribution: 100n, amIBidding: true, myBid: 1000n }),
+    auction({
+      approversCount: 2,
+      bidderAddresses: ['0xme', '0xother'],
+      highestBid: 1500n,
+      minimumContribution: 100n,
+      amIBidding: true,
+      myBid: 1000n,
+    }),
     9999n,
     strategy
   );
   assert.strictEqual(result.amount, 600n);
+});
+
+test('skips topping up when already sole bidder', () => {
+  const result = shouldBid(
+    auction({
+      approversCount: 1,
+      bidderAddresses: ['0xme'],
+      highestBid: 300n,
+      minimumContribution: 100n,
+      amIBidding: true,
+      myBid: 300n,
+      amIWinning: false,
+    }),
+    9999n,
+    strategy
+  );
+  assert.strictEqual(result.bid, false);
+  assert.strictEqual(result.reason, 'Already leading without competition');
+});
+
+test('still bids again when another bidder exists', () => {
+  const result = shouldBid(
+    auction({
+      approversCount: 2,
+      bidderAddresses: ['0xme', '0xother'],
+      highestBid: 400n,
+      minimumContribution: 100n,
+      amIBidding: true,
+      myBid: 300n,
+      amIWinning: false,
+    }),
+    9999n,
+    strategy
+  );
+  assert.strictEqual(result.bid, true);
+  assert.strictEqual(result.amount, 200n);
 });
 
 test('skips own auction', () => {
