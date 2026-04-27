@@ -5,11 +5,12 @@
     "privateKey": "0xb01d890e1b66d5aa14434070f4d49c4bdb6884af4ac8b8ffae84c660988f6182",
     "enabled": true,
     "overrides": {
+      "AUTO_TRADE_INTERVAL_SEC": "60",
       "AUTO_TRADE_CRON": "*/2 * * * *",
       "TRADING_PROFILE": "balanced",
       "MAX_BID_WEI": "",
       "ENABLE_BIDDING": "true",
-      "ENABLE_SELLING": "true",
+      "ENABLE_SELLING": "false",
       "ENABLE_FINALIZE": "true",
       "AUTO_GENERATE_AUCTIONS": "true",
       "AUTO_GENERATE_COUNT": "",
@@ -17,6 +18,46 @@
       "MAX_TOTAL_SELL_AUCTIONS": ""
     },
     "createdAt": "2026-04-23T11:06:11.448Z",
-    "updatedAt": "2026-04-23T11:06:11.448Z"
+    "updatedAt": "2026-04-26T12:05:13.153Z"
+  },
+  {
+    "id": "bot-c-55msz3",
+    "name": "Bot C",
+    "privateKey": "0x73cecdedc93a800d3cfaac30c63e982b242e4d7e2a47a2eb0682e540b442c67a",
+    "enabled": true,
+    "overrides": {
+      "AUTO_TRADE_INTERVAL_SEC": "60",
+      "TRADING_PROFILE": "balanced",
+      "MAX_BID_WEI": "",
+      "ENABLE_BIDDING": "true",
+      "ENABLE_SELLING": "false",
+      "ENABLE_FINALIZE": "true",
+      "AUTO_GENERATE_AUCTIONS": "false",
+      "AUTO_GENERATE_COUNT": "",
+      "TARGET_ACTIVE_SELL_AUCTIONS": "",
+      "MAX_TOTAL_SELL_AUCTIONS": ""
+    },
+    "createdAt": "2026-04-26T11:15:43.959Z",
+    "updatedAt": "2026-04-26T12:05:51.305Z"
+  },
+  {
+    "id": "bot-d-3kym1f",
+    "name": "Bot D",
+    "privateKey": "0xa8E0F8ba9D66Acfa9D9eb58DDA2D0d1AaB7ba2F2",
+    "enabled": true,
+    "overrides": {
+      "AUTO_TRADE_INTERVAL_SEC": "60",
+      "TRADING_PROFILE": "balanced",
+      "MAX_BID_WEI": "",
+      "ENABLE_BIDDING": "true",
+      "ENABLE_SELLING": "false",
+      "ENABLE_FINALIZE": "true",
+      "AUTO_GENERATE_AUCTIONS": "false",
+      "AUTO_GENERATE_COUNT": "",
+      "TARGET_ACTIVE_SELL_AUCTIONS": "",
+      "MAX_TOTAL_SELL_AUCTIONS": ""
+    },
+    "createdAt": "2026-04-26T11:57:04.255Z",
+    "updatedAt": "2026-04-26T12:06:28.882Z"
   }
 ]

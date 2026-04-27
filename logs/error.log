@@ -362,3 +362,27 @@
 {"error":"execution reverted: Insufficient budget","level":"error","message":"Exploratory bid failed on 0x1a8363B816EaF1b3EcAA8b5EDD2C4Bd1F622AE02","timestamp":"2026-04-23 13:18:28"}
 {"error":"execution reverted: Insufficient budget","level":"error","message":"Exploratory bid failed on 0x1a8363B816EaF1b3EcAA8b5EDD2C4Bd1F622AE02","timestamp":"2026-04-23 13:20:26"}
 {"error":"execution reverted: Insufficient budget","level":"error","message":"Exploratory bid failed on 0x1a8363B816EaF1b3EcAA8b5EDD2C4Bd1F622AE02","timestamp":"2026-04-23 13:22:27"}
+{"error":"nonce too low: next nonce 240, tx nonce 239","level":"error","message":"Exploratory bid failed on 0xf49d08A3FD18F69bA2d275F8151dd40526aE349f","timestamp":"2026-04-26 11:17:26"}
+{"error":"Returned error:","level":"error","message":"Bid failed on 0x83331012089d09D04f816912cA90271f418Eb89a","timestamp":"2026-04-26 12:23:32"}
+{"error":"ENOENT: no such file or directory, open 'C:\\Users\\Programmers\\Desktop\\bc_SUPERBOT\\files\\admin.html'","level":"error","message":"Unhandled promise rejection","stack":"Error: ENOENT: no such file or directory, open 'C:\\Users\\Programmers\\Desktop\\bc_SUPERBOT\\files\\admin.html'\n    at Object.readFileSync (node:fs:441:20)\n    at Server.<anonymous> (C:\\Users\\Programmers\\Desktop\\bc_SUPERBOT\\files\\admin.js:509:23)\n    at Server.emit (node:events:519:28)\n    at parserOnIncoming (node:_http_server:1186:12)\n    at HTTPParser.parserOnHeadersComplete (node:_http_common:122:17)","timestamp":"2026-04-26 13:14:07"}
+{"error":"Returned error:","level":"error","message":"Bid failed on 0x79f42949112803219EaC0b9144eF5d84b2c28Af1","timestamp":"2026-04-26 13:27:51"}
+{"error":"Returned error:","level":"error","message":"Cycle error","timestamp":"2026-04-26 13:27:52"}
+{"error":"Returned error: ","level":"error","message":"Unhandled promise rejection","stack":"ResponseError: Returned error: \n    at HttpProvider.<anonymous> (C:\\Users\\Programmers\\Desktop\\bc_SUPERBOT\\files\\node_modules\\web3-providers-http\\lib\\commonjs\\index.js:61:23)\n    at Generator.next (<anonymous>)\n    at fulfilled (C:\\Users\\Programmers\\Desktop\\bc_SUPERBOT\\files\\node_modules\\web3-providers-http\\lib\\commonjs\\index.js:21:58)\n    at process.processTicksAndRejections (node:internal/process/task_queues:105:5)","timestamp":"2026-04-26 13:27:54"}
+{"error":"txHash.slice is not a function","level":"error","message":"Bid failed on 0x999c36DBD32195348dbAE5E70Cb7E3aD46104D23","timestamp":"2026-04-26 14:23:50"}
+{"error":"txHash.slice is not a function","level":"error","message":"Worker finalize failed for 0x116B9Df581b89a875943AD92c74132C7af3cE443","timestamp":"2026-04-26 14:23:51"}
+{"error":"txHash.slice is not a function","level":"error","message":"Bid failed on 0x999c36DBD32195348dbAE5E70Cb7E3aD46104D23","timestamp":"2026-04-26 14:23:54"}
+{"error":"txHash.slice is not a function","level":"error","message":"Worker finalize failed for 0xc92Ec9B885e9d0f7Db3307eD76aECDC1eEF0dBc9","timestamp":"2026-04-26 14:25:22"}
+{"error":"txHash.slice is not a function","level":"error","message":"Bid failed on 0x999c36DBD32195348dbAE5E70Cb7E3aD46104D23","timestamp":"2026-04-26 14:25:49"}
+{"error":"txHash.slice is not a function","level":"error","message":"Bid failed on 0x999c36DBD32195348dbAE5E70Cb7E3aD46104D23","timestamp":"2026-04-26 14:25:51"}
+{"error":"txHash.slice is not a function","level":"error","message":"Bid failed on 0x999c36DBD32195348dbAE5E70Cb7E3aD46104D23","timestamp":"2026-04-26 14:25:59"}
+{"error":"txHash.slice is not a function","level":"error","message":"Bid failed on 0x999c36DBD32195348dbAE5E70Cb7E3aD46104D23","timestamp":"2026-04-26 14:27:48"}
+{"error":"txHash.slice is not a function","level":"error","message":"Bid failed on 0x999c36DBD32195348dbAE5E70Cb7E3aD46104D23","timestamp":"2026-04-26 14:27:52"}
+{"error":"txHash.slice is not a function","level":"error","message":"Bid failed on 0x999c36DBD32195348dbAE5E70Cb7E3aD46104D23","timestamp":"2026-04-26 14:28:00"}
+{"error":"txHash.slice is not a function","level":"error","message":"Bid failed on 0x33f92380E920783ce7A6D4d8326f58996B31fC39","timestamp":"2026-04-26 14:29:49"}
+{"error":"txHash.slice is not a function","level":"error","message":"Bid failed on 0xBCc275a51644dc618Ab643086F94Edd3F0177611","timestamp":"2026-04-26 14:29:51"}
+{"error":"txHash.slice is not a function","level":"error","message":"Bid failed on 0xBCc275a51644dc618Ab643086F94Edd3F0177611","timestamp":"2026-04-26 14:29:59"}
+{"error":"txHash.slice is not a function","level":"error","message":"Bid failed on 0xBCc275a51644dc618Ab643086F94Edd3F0177611","timestamp":"2026-04-26 14:33:50"}
+{"error":"txHash.slice is not a function","level":"error","message":"Bid failed on 0xAb04c5d4b6E3bbA1d2e78Bd7bA6D7F477cBA1741","timestamp":"2026-04-26 14:39:54"}
+{"error":"Bot is not running","level":"error","message":"Admin API error","timestamp":"2026-04-26 14:58:36"}
+{"error":"Bot is not running","level":"error","message":"Admin API error","timestamp":"2026-04-26 14:58:40"}
+{"error":"Returned error:","level":"error","message":"Bid failed on 0x3663CD217c4d746267306Da23d8f26A2Eb042b3c","timestamp":"2026-04-27 10:57:07"}
