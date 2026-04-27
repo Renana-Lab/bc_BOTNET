@@ -386,3 +386,4 @@
 {"error":"Bot is not running","level":"error","message":"Admin API error","timestamp":"2026-04-26 14:58:36"}
 {"error":"Bot is not running","level":"error","message":"Admin API error","timestamp":"2026-04-26 14:58:40"}
 {"error":"Returned error:","level":"error","message":"Bid failed on 0x3663CD217c4d746267306Da23d8f26A2Eb042b3c","timestamp":"2026-04-27 10:57:07"}
+{"error":"execution reverted: Auction ended","level":"error","message":"Bid failed on 0x85Da5Bf866E9f91f1d68c32376794F34d0Cc0DEC","timestamp":"2026-04-27 11:23:21"}
