@@ -49,7 +49,7 @@
       "AUTO_TRADE_INTERVAL_SEC": "60",
       "TRADING_PROFILE": "balanced",
       "MAX_BID_WEI": "",
-      "ENABLE_BIDDING": "true",
+      "ENABLE_BIDDING": "false",
       "ENABLE_SELLING": "false",
       "ENABLE_FINALIZE": "true",
       "AUTO_GENERATE_AUCTIONS": "false",
@@ -58,6 +58,6 @@
       "MAX_TOTAL_SELL_AUCTIONS": ""
     },
     "createdAt": "2026-04-26T11:57:04.255Z",
-    "updatedAt": "2026-04-26T12:06:28.882Z"
+    "updatedAt": "2026-04-27T08:37:09.176Z"
   }
 ]
