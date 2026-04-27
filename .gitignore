@@ -1,4 +1,3 @@
-logs/bot.log
-logs/error.log
-logs/
 node_modules/
+logs/
+docs/
