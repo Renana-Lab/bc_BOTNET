@@ -16,6 +16,7 @@
     "status": "node src/cli.js --mode=status",
     "winner": "node src/cli.js --mode=winner",
     "listen": "node src/cli.js --mode=listen",
+    "build": "node scripts/build-static.js",
     "test": "node test/bidder.test.js"
   },
   "dependencies": {

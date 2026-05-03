@@ -1,0 +1,2016 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>DataMarketplace Bot Admin</title>
+<style>
+  :root {
+    --bg: #08111d;
+    --bg-2: #101a26;
+    --panel: rgba(16, 27, 40, 0.9);
+    --panel-strong: rgba(20, 34, 50, 0.96);
+    --panel-soft: rgba(255, 255, 255, 0.045);
+    --line: rgba(148, 163, 184, 0.18);
+    --line-strong: rgba(148, 163, 184, 0.32);
+    --text: #edf5ff;
+    --muted: #8fa3b8;
+    --muted-2: #64778c;
+    --blue: #4f8cff;
+    --green: #39d98a;
+    --red: #ff6b6b;
+    --amber: #f6bd4b;
+    --cyan: #6ee7f9;
+    --radius: 18px;
+    --font: "Bahnschrift", "Aptos", "Trebuchet MS", sans-serif;
+    --mono: "Cascadia Mono", "Lucida Console", monospace;
+  }
+
+  * { box-sizing: border-box; }
+  html { min-height: 100%; background: var(--bg); }
+  body {
+    min-height: 100vh;
+    margin: 0;
+    color: var(--text);
+    font-family: var(--font);
+    letter-spacing: 0.01em;
+    background:
+      radial-gradient(circle at 12% -12%, rgba(78, 140, 255, 0.28), transparent 32rem),
+      radial-gradient(circle at 92% 5%, rgba(57, 217, 138, 0.14), transparent 26rem),
+      linear-gradient(135deg, var(--bg), #0b1421 52%, #07101b);
+  }
+
+  body::before {
+    content: "";
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    opacity: 0.35;
+    background-image:
+      linear-gradient(rgba(255, 255, 255, 0.035) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(255, 255, 255, 0.028) 1px, transparent 1px);
+    background-size: 44px 44px;
+    mask-image: linear-gradient(to bottom, black, transparent 80%);
+  }
+
+  header {
+    position: sticky;
+    top: 0;
+    z-index: 10;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    min-height: 72px;
+    padding: 16px 26px;
+    border-bottom: 1px solid var(--line);
+    background: rgba(8, 17, 29, 0.82);
+    backdrop-filter: blur(18px);
+    box-shadow: 0 18px 50px rgba(0, 0, 0, 0.28);
+  }
+
+  header h1 {
+    margin: 0;
+    font-size: 22px;
+    font-weight: 800;
+    letter-spacing: -0.02em;
+  }
+  .brand { display: grid; gap: 2px; }
+  .brand-kicker {
+    color: var(--muted);
+    font-size: 11px;
+    font-weight: 900;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+  }
+  .wallet-chip {
+    margin-left: auto;
+    border: 1px solid var(--line);
+    border-radius: 999px;
+    background: rgba(255, 255, 255, 0.055);
+    padding: 8px 11px;
+  }
+
+  .dot {
+    width: 12px;
+    height: 12px;
+    border-radius: 999px;
+    background: var(--red);
+    box-shadow: 0 0 0 7px rgba(255, 107, 107, 0.09);
+  }
+  .dot.on {
+    background: var(--green);
+    box-shadow: 0 0 0 7px rgba(57, 217, 138, 0.1), 0 0 24px rgba(57, 217, 138, 0.62);
+  }
+
+  .badge {
+    padding: 6px 11px;
+    border: 1px solid var(--line);
+    border-radius: 999px;
+    background: rgba(255, 255, 255, 0.06);
+    color: #c9d8e8;
+    font-size: 11px;
+    font-weight: 800;
+    letter-spacing: 0.08em;
+  }
+
+  main {
+    position: relative;
+    display: grid;
+    grid-template-columns: minmax(300px, 340px) minmax(0, 1fr);
+    gap: 18px;
+    min-height: calc(100vh - 72px);
+    padding: 18px;
+  }
+
+  aside, section { min-width: 0; }
+  aside {
+    position: sticky;
+    top: 90px;
+    align-self: start;
+    max-height: calc(100vh - 108px);
+    overflow: auto;
+    padding-right: 2px;
+  }
+
+  section {
+    min-width: 0;
+    padding-bottom: 36px;
+  }
+
+  .stack { display: flex; flex-direction: column; gap: 14px; }
+
+  .card {
+    position: relative;
+    overflow: hidden;
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    background:
+      linear-gradient(180deg, rgba(255, 255, 255, 0.052), rgba(255, 255, 255, 0.026)),
+      var(--panel);
+    padding: 16px;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.24);
+  }
+
+  .card::before {
+    content: "";
+    position: absolute;
+    inset: 0 0 auto;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.28), transparent);
+    pointer-events: none;
+  }
+
+  .card h2 {
+    margin: 0 0 14px;
+    color: #b7c8dc;
+    font-size: 11px;
+    font-weight: 900;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+  }
+
+  .grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
+  .stat, .fleet-tile {
+    min-width: 0;
+    overflow: hidden;
+    border: 1px solid var(--line);
+    border-radius: 14px;
+    background: rgba(255, 255, 255, 0.052);
+    padding: 12px;
+  }
+  .stat .value, .fleet-tile strong {
+    display: block;
+    color: #ffffff;
+    font-size: clamp(18px, 2vw, 25px);
+    font-weight: 900;
+    line-height: 1.05;
+    letter-spacing: -0.03em;
+    overflow-wrap: anywhere;
+    word-break: break-word;
+  }
+  .stat .label, .fleet-tile span {
+    display: block;
+    margin-top: 6px;
+    color: var(--muted);
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+  }
+
+  .field { margin-bottom: 12px; }
+  .field label {
+    display: block;
+    margin-bottom: 6px;
+    color: #9fb1c6;
+    font-size: 12px;
+    font-weight: 800;
+  }
+
+  input, select, textarea, button { font: inherit; }
+  input, select, textarea {
+    width: 100%;
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    background: rgba(4, 10, 18, 0.44);
+    color: var(--text);
+    padding: 10px 12px;
+    outline: none;
+    transition: border-color 0.16s ease, box-shadow 0.16s ease, background 0.16s ease;
+  }
+  input:focus, select:focus, textarea:focus {
+    border-color: rgba(79, 140, 255, 0.82);
+    background: rgba(4, 10, 18, 0.68);
+    box-shadow: 0 0 0 4px rgba(79, 140, 255, 0.14);
+  }
+  input[type="checkbox"] {
+    width: 42px;
+    height: 24px;
+    appearance: none;
+    cursor: pointer;
+    border-radius: 999px;
+    padding: 0;
+    background: rgba(148, 163, 184, 0.18);
+  }
+  input[type="checkbox"]::after {
+    content: "";
+    display: block;
+    width: 18px;
+    height: 18px;
+    margin: 2px;
+    border-radius: 999px;
+    background: #c8d4e0;
+    transition: transform 0.16s ease, background 0.16s ease;
+  }
+  input[type="checkbox"]:checked {
+    border-color: rgba(57, 217, 138, 0.5);
+    background: rgba(57, 217, 138, 0.28);
+  }
+  input[type="checkbox"]:checked::after {
+    transform: translateX(18px);
+    background: #ffffff;
+  }
+  textarea { min-height: 96px; resize: vertical; }
+
+  .toggle-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    margin: 10px 0;
+    border: 1px solid var(--line);
+    border-radius: 13px;
+    background: rgba(255, 255, 255, 0.035);
+    padding: 10px 12px;
+  }
+  .toggle-row span { color: #afbed0; font-size: 13px; font-weight: 800; }
+
+  .btn-row, .quickbar {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+    align-items: center;
+  }
+  .quickbar { margin-top: 12px; }
+  button {
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    cursor: pointer;
+    padding: 10px 14px;
+    color: #eef6ff;
+    font-weight: 900;
+    background: rgba(255, 255, 255, 0.07);
+    transition: transform 0.14s ease, border-color 0.14s ease, background 0.14s ease, opacity 0.14s ease;
+  }
+  button:hover:not(:disabled) {
+    transform: translateY(-1px);
+    border-color: var(--line-strong);
+    background: rgba(255, 255, 255, 0.105);
+  }
+  button.primary { border-color: rgba(79, 140, 255, 0.62); background: linear-gradient(135deg, #376df1, #4f8cff); }
+  button.success { border-color: rgba(57, 217, 138, 0.5); background: linear-gradient(135deg, #18a765, #39d98a); color: #06120c; }
+  button.danger { border-color: rgba(255, 107, 107, 0.58); background: linear-gradient(135deg, #d74343, #ff6b6b); }
+  button.warning { border-color: rgba(246, 189, 75, 0.58); background: linear-gradient(135deg, #f0a329, #f6bd4b); color: #1d1404; }
+  button:disabled { opacity: 0.42; cursor: not-allowed; }
+
+  .tabs {
+    position: sticky;
+    top: 90px;
+    z-index: 9;
+    display: flex;
+    gap: 7px;
+    margin-bottom: 16px;
+    border: 1px solid var(--line);
+    border-radius: 18px;
+    background: rgba(8, 17, 29, 0.72);
+    padding: 7px;
+    backdrop-filter: blur(16px);
+  }
+  .tab {
+    flex: 0 0 auto;
+    border: 1px solid transparent;
+    border-radius: 13px;
+    background: transparent;
+    color: var(--muted);
+    padding: 10px 15px;
+  }
+  .tab.active {
+    border-color: rgba(79, 140, 255, 0.4);
+    background: rgba(79, 140, 255, 0.16);
+    color: #ffffff;
+  }
+
+  .panel { display: none; }
+  .panel.active { display: block; animation: panelIn 0.18s ease-out; }
+  @keyframes panelIn {
+    from { opacity: 0; transform: translateY(6px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  table {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0;
+    overflow: hidden;
+    border: 1px solid var(--line);
+    border-radius: 16px;
+  }
+  th, td {
+    border-bottom: 1px solid var(--line);
+    padding: 13px 12px;
+    text-align: left;
+    vertical-align: top;
+  }
+  tr:last-child td { border-bottom: 0; }
+  th {
+    background: rgba(255, 255, 255, 0.045);
+    color: #9fb1c6;
+    font-size: 11px;
+    font-weight: 900;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+  }
+  tbody tr { background: rgba(255, 255, 255, 0.018); }
+  tbody tr:hover { background: rgba(79, 140, 255, 0.055); }
+
+  .pill {
+    display: inline-flex;
+    align-items: center;
+    min-height: 24px;
+    border-radius: 999px;
+    padding: 4px 9px;
+    font-size: 11px;
+    font-weight: 900;
+    letter-spacing: 0.02em;
+  }
+  .pill.open { background: rgba(57, 217, 138, 0.14); color: #9bf3c5; }
+  .pill.closed { background: rgba(148, 163, 184, 0.13); color: #cbd5e1; }
+  .pill.winning { background: rgba(246, 189, 75, 0.16); color: #ffdc83; }
+  .pill.mine { background: rgba(79, 140, 255, 0.16); color: #adc8ff; }
+
+  .mono {
+    color: var(--muted);
+    font-family: var(--mono);
+    font-size: 12px;
+  }
+  .muted { color: var(--muted); }
+  #logs {
+    height: 430px;
+    overflow-y: auto;
+    border: 1px solid var(--line);
+    border-radius: 16px;
+    background: rgba(2, 7, 13, 0.76);
+    padding: 14px;
+    color: #c6d3e2;
+    font-family: var(--mono);
+    font-size: 12px;
+    line-height: 1.7;
+  }
+
+  .toast {
+    position: fixed;
+    right: 22px;
+    bottom: 22px;
+    z-index: 20;
+    max-width: min(420px, calc(100vw - 44px));
+    border: 1px solid var(--line);
+    border-radius: 16px;
+    color: white;
+    opacity: 0;
+    padding: 13px 16px;
+    pointer-events: none;
+    transform: translateY(14px);
+    transition: 0.2s;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.34);
+  }
+  .toast.show { opacity: 1; transform: translateY(0); }
+  .toast.ok { background: rgba(17, 143, 83, 0.96); }
+  .toast.err { background: rgba(191, 57, 57, 0.96); }
+
+  .bot-meta { display: flex; gap: 7px; flex-wrap: wrap; margin-top: 8px; }
+  .bot-name { color: #ffffff; font-size: 16px; font-weight: 900; letter-spacing: -0.01em; }
+  .bot-actions { display: flex; gap: 8px; flex-wrap: wrap; justify-content: flex-end; }
+  .fleet-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px; margin: 14px 0; }
+  .bot-list-simple { display: grid; gap: 12px; }
+  .bot-compact, .seller-row {
+    border: 1px solid var(--line);
+    border-radius: 16px;
+    background: rgba(255, 255, 255, 0.045);
+    padding: 14px;
+  }
+  .bot-compact-head, .seller-row-head {
+    display: flex;
+    justify-content: space-between;
+    gap: 14px;
+    align-items: flex-start;
+  }
+  .bot-switches { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; margin-top: 12px; }
+  .mini-toggle {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    background: rgba(0, 0, 0, 0.16);
+    color: #aebed0;
+    font-size: 12px;
+    font-weight: 800;
+    padding: 8px 10px;
+  }
+  .mini-toggle input { width: 42px; }
+
+  details.advanced-box {
+    margin-top: 14px;
+    border: 1px solid var(--line);
+    border-radius: 16px;
+    background: rgba(255, 255, 255, 0.035);
+    padding: 13px;
+  }
+  details.advanced-box summary {
+    cursor: pointer;
+    color: #dbe8f7;
+    font-weight: 900;
+  }
+  details.advanced-box[open] summary { margin-bottom: 12px; }
+
+  .inline-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+  .schedule-builder { display: grid; gap: 8px; }
+  .schedule-row { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
+  .schedule-preview { color: #b8c8da; font-size: 12px; }
+  .seller-row { display: grid; gap: 12px; }
+  .seller-grid { display: grid; grid-template-columns: 1.2fr 0.8fr 0.7fr 0.7fr; gap: 10px; }
+  .seller-wide { grid-column: 1 / -1; }
+
+  @media (max-width: 1080px) {
+    main { grid-template-columns: 1fr; }
+    aside { position: static; max-height: none; padding-right: 0; }
+    .tabs { top: 72px; overflow-x: auto; }
+  }
+
+  @media (max-width: 760px) {
+    header { padding: 14px 16px; }
+    header h1 { font-size: 18px; }
+    main { padding: 12px; }
+    .inline-grid, .seller-grid, .schedule-row, .bot-switches { grid-template-columns: 1fr; }
+    .fleet-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .bot-actions, .bot-compact-head, .seller-row-head { justify-content: flex-start; flex-direction: column; }
+    table { display: block; overflow-x: auto; white-space: nowrap; }
+  }
+</style>
+<script src="https://cdn.jsdelivr.net/npm/ethers@6.13.4/dist/ethers.umd.min.js"></script>
+</head>
+<body>
+<header>
+  <div id="statusDot" class="dot"></div>
+  <div class="brand">
+    <div class="brand-kicker">Network Control</div>
+    <h1>DataMarketplace Bot</h1>
+  </div>
+  <span id="modeBadge" class="badge">SIMULATE</span>
+  <span id="walletShort" class="mono wallet-chip">loading...</span>
+</header>
+
+<main>
+  <aside>
+    <div class="stack">
+      <div class="card">
+        <h2>Wallet</h2>
+        <div class="grid">
+          <div class="stat"><div id="balETH" class="value">-</div><div class="label">Balance ETH</div></div>
+          <div class="stat"><div id="budgetWei" class="value">-</div><div class="label">Budget wei</div></div>
+          <div class="stat"><div id="statBids" class="value">0</div><div class="label">Bids</div></div>
+          <div class="stat"><div id="statCreated" class="value">0</div><div class="label">Created</div></div>
+        </div>
+        <div id="walletAddr" class="mono" style="margin-top:10px">-</div>
+      </div>
+
+      <div class="card">
+        <h2>Automation</h2>
+        <div class="btn-row" style="margin-bottom:10px">
+          <button id="btnStart" class="success" onclick="botStart()">Start</button>
+          <button id="btnStop" class="danger" onclick="botStop()" disabled>Stop</button>
+          <button onclick="runOnce()">Run Once</button>
+        </div>
+        <div class="field">
+          <label>Run every</label>
+          <div class="schedule-builder">
+            <div class="schedule-row">
+              <div class="field" style="margin:0"><label>Minutes</label><input id="cfgScheduleMinutes" type="number" min="0" value="2" onchange="updateScheduleBuilder('cfg')" /></div>
+              <div class="field" style="margin:0"><label>Seconds</label><input id="cfgScheduleSeconds" type="number" min="0" max="59" value="0" onchange="updateScheduleBuilder('cfg')" /></div>
+            </div>
+            <div id="cfgSchedulePreview" class="mono schedule-preview">Every 2 minutes</div>
+            <input id="cfgInterval" type="hidden" />
+          </div>
+        </div>
+        <div class="toggle-row"><span>Enable bidding</span><input id="cfgEnableBidding" type="checkbox" onchange="queueSaveConfig()" /></div>
+        <div class="toggle-row"><span>Enable selling</span><input id="cfgEnableSelling" type="checkbox" onchange="queueSaveConfig()" /></div>
+        <div class="toggle-row"><span>Enable finalize</span><input id="cfgEnableFinalize" type="checkbox" onchange="queueSaveConfig()" /></div>
+        <div class="toggle-row"><span>Auto-generate auction ideas</span><input id="cfgAutoGenerate" type="checkbox" onchange="queueSaveConfig()" /></div>
+        <div class="field">
+          <label>Generated auctions per cycle</label>
+          <input id="cfgAutoGenerateCount" type="number" min="1" max="10" />
+        </div>
+        <div class="field">
+          <label>Target active sell auctions</label>
+          <input id="cfgTargetActiveSellAuctions" type="number" min="0" max="20" />
+        </div>
+        <div class="field">
+          <label>Max total bot auctions</label>
+          <input id="cfgMaxTotalSellAuctions" type="number" min="0" max="500" />
+        </div>
+        <div class="mono" id="lastCycle" style="margin-top:10px">Last cycle: never</div>
+        <div class="card" style="margin-top:12px;background:#121b2d">
+          <h2>Schedule Help</h2>
+          <div class="muted" style="font-size:13px;line-height:1.6">
+            Choose a simple minutes/seconds interval. Each bot can have its own interval.
+            No cron syntax needed.
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <h2>Strategy</h2>
+        <div class="field"><label>Max bid wei</label><input id="cfgMaxBid" type="number" /></div>
+        <div class="field"><label>Outbid by wei</label><input id="cfgOutbid" type="number" value="10" readonly /></div>
+        <div class="field"><label>Max allowed minimum contribution</label><input id="cfgMaxMin" type="number" /></div>
+        <div class="field"><label>Minimum time remaining seconds</label><input id="cfgMinTime" type="number" /></div>
+        <div class="toggle-row"><span>Skip if already winning</span><input id="cfgSkipWin" type="checkbox" onchange="queueSaveConfig()" /></div>
+        <button class="primary" style="width:100%" onclick="saveConfig()">Save Strategy</button>
+      </div>
+    </div>
+  </aside>
+
+  <section>
+    <div class="tabs">
+      <button class="tab active" onclick="showTab('auctions', this)">Auctions</button>
+      <button class="tab" onclick="showTab('bots', this)">Bots</button>
+      <button class="tab" onclick="showTab('seller', this)">Seller</button>
+      <button class="tab" onclick="showTab('winner', this)">Winner</button>
+      <button class="tab" onclick="showTab('logs', this)">Logs</button>
+    </div>
+
+    <div id="panel-auctions" class="panel active">
+      <div class="card">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
+          <div id="auctionMeta" class="muted">Loading...</div>
+          <div class="btn-row">
+            <button onclick="showDiagnostics()">Diagnostics</button>
+            <button onclick="refreshAuctions()">Refresh</button>
+          </div>
+        </div>
+        <table>
+          <thead>
+            <tr><th>Description</th><th>Status</th><th>Date</th><th>Highest</th><th>My Bid</th><th>Actions</th></tr>
+          </thead>
+          <tbody id="auctionBody">
+            <tr><td colspan="6" class="muted">Loading...</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <div id="panel-bots" class="panel">
+      <div class="card" style="margin-bottom:14px">
+        <div style="display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap">
+          <div>
+            <h2 style="margin:0">Bot Fleet</h2>
+            <div id="botSummary" class="muted" style="margin-top:6px">Loading bots...</div>
+          </div>
+          <button onclick="loadBots()">Refresh</button>
+        </div>
+        <div class="fleet-grid">
+          <div class="fleet-tile"><strong id="fleetRegistered">0</strong><span class="muted">registered</span></div>
+          <div class="fleet-tile"><strong id="fleetRunning">0</strong><span class="muted">running</span></div>
+          <div class="fleet-tile"><strong id="fleetBids">0</strong><span class="muted">bids</span></div>
+          <div class="fleet-tile"><strong id="fleetErrors">0</strong><span class="muted">errors</span></div>
+        </div>
+        <div class="quickbar">
+          <button class="success" onclick="startNetworkBots()">Start Enabled</button>
+          <button onclick="runNetworkBots()">Run Now</button>
+          <button class="danger" onclick="stopNetworkBots()">Stop All</button>
+          <button class="warning" onclick="fleetPreset('pause')">Pause Bidding</button>
+          <button class="primary" onclick="fleetPreset('auto')">Auto: Bid + Sell</button>
+          <button onclick="fleetPreset('bid')">Bidding Only</button>
+          <button onclick="fleetPreset('sell')">Selling Only</button>
+        </div>
+      </div>
+
+      <div class="card" style="margin-bottom:14px">
+        <div style="display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap">
+          <h2 style="margin:0">All Bots</h2>
+          <button class="primary" onclick="toggleBotEditor()">Add Bot</button>
+        </div>
+        <div id="botList" class="bot-list-simple">Loading bots...</div>
+      </div>
+
+      <details class="advanced-box" id="botEditorBox">
+        <summary>Add / edit bot details</summary>
+      <div class="card" style="margin-bottom:14px">
+        <h2>Add Or Edit Bot</h2>
+        <input id="botId" type="hidden" />
+        <div class="inline-grid">
+          <div class="field"><label>Name</label><input id="botName" placeholder="Bot Alpha" /></div>
+          <div class="field"><label>Private key</label><input id="botPrivateKey" placeholder="0x..." /></div>
+          <div class="field">
+            <label>Run every</label>
+            <div class="schedule-builder">
+              <div class="schedule-row">
+                <div class="field" style="margin:0"><label>Minutes</label><input id="botScheduleMinutes" type="number" min="0" value="2" onchange="updateScheduleBuilder('bot')" /></div>
+                <div class="field" style="margin:0"><label>Seconds</label><input id="botScheduleSeconds" type="number" min="0" max="59" value="0" onchange="updateScheduleBuilder('bot')" /></div>
+              </div>
+              <div id="botSchedulePreview" class="mono schedule-preview">Every 2 minutes</div>
+              <input id="botInterval" type="hidden" />
+            </div>
+          </div>
+          <div class="field"><label>Trading profile</label><select id="botTradingProfile"><option value="balanced">balanced</option><option value="conservative">conservative</option><option value="aggressive">aggressive</option></select></div>
+          <div class="field"><label>Max bid wei</label><input id="botMaxBid" type="number" min="0" /></div>
+          <div class="field"><label>Target active sell auctions</label><input id="botTargetAuctions" type="number" min="0" /></div>
+          <div class="field"><label>Max total sell auctions</label><input id="botMaxTotalAuctions" type="number" min="0" /></div>
+          <div class="field"><label>Generated auctions per cycle</label><input id="botGenerateCount" type="number" min="1" /></div>
+        </div>
+        <div class="toggle-row"><span>Bot enabled</span><input id="botEnabled" type="checkbox" checked /></div>
+        <div class="toggle-row"><span>Enable bidding</span><input id="botEnableBidding" type="checkbox" checked /></div>
+        <div class="toggle-row"><span>Enable selling</span><input id="botEnableSelling" type="checkbox" checked /></div>
+        <div class="toggle-row"><span>Enable finalize</span><input id="botEnableFinalize" type="checkbox" checked /></div>
+        <div class="toggle-row"><span>Auto-generate auctions</span><input id="botAutoGenerate" type="checkbox" checked /></div>
+        <div class="btn-row">
+          <button class="primary" onclick="saveBotProfile()">Save Bot</button>
+          <button onclick="resetBotForm()">Clear</button>
+        </div>
+      </div>
+      </details>
+
+      <details class="advanced-box">
+        <summary>Advanced fleet policy</summary>
+        <div class="muted" style="margin:10px 0">Broadcast detailed settings to many registered bots. Leave a field blank to keep each bot's current value.</div>
+        <div class="inline-grid">
+          <div class="field">
+            <label>Target bots</label>
+            <select id="netScope">
+              <option value="all">All registered bots</option>
+              <option value="enabled">Enabled bots only</option>
+              <option value="running">Running bots only</option>
+            </select>
+          </div>
+          <div class="field">
+            <label>Trading profile</label>
+            <select id="netTradingProfile">
+              <option value="">No change</option>
+              <option value="balanced">balanced</option>
+              <option value="conservative">conservative</option>
+              <option value="aggressive">aggressive</option>
+            </select>
+          </div>
+          <div class="field">
+            <label>Run every</label>
+            <div class="schedule-builder">
+              <div class="schedule-row">
+                <div class="field" style="margin:0"><label>Minutes</label><input id="netScheduleMinutes" type="number" min="0" placeholder="No change" onchange="updateScheduleBuilder('net')" /></div>
+                <div class="field" style="margin:0"><label>Seconds</label><input id="netScheduleSeconds" type="number" min="0" max="59" placeholder="No change" onchange="updateScheduleBuilder('net')" /></div>
+              </div>
+              <div id="netSchedulePreview" class="mono schedule-preview">No change</div>
+              <input id="netInterval" type="hidden" />
+            </div>
+          </div>
+          <div class="field"><label>Max bid wei</label><input id="netMaxBid" type="number" min="0" placeholder="Leave blank" /></div>
+          <div class="field"><label>Outbid by wei</label><input id="netOutbid" type="number" min="10" value="10" readonly /></div>
+          <div class="field"><label>Target active sell auctions</label><input id="netTargetActive" type="number" min="0" placeholder="Leave blank" /></div>
+          <div class="field"><label>Max total sell auctions</label><input id="netMaxTotal" type="number" min="0" placeholder="Leave blank" /></div>
+          <div class="field"><label>Generated auctions per cycle</label><input id="netGenerateCount" type="number" min="1" placeholder="Leave blank" /></div>
+          <div class="field"><label>Bot enabled</label><select id="netEnabled"><option value="">No change</option><option value="true">Enable</option><option value="false">Disable</option></select></div>
+          <div class="field"><label>Bidding</label><select id="netEnableBidding"><option value="">No change</option><option value="true">On</option><option value="false">Off</option></select></div>
+          <div class="field"><label>Selling</label><select id="netEnableSelling"><option value="">No change</option><option value="true">On</option><option value="false">Off</option></select></div>
+          <div class="field"><label>Finalize</label><select id="netEnableFinalize"><option value="">No change</option><option value="true">On</option><option value="false">Off</option></select></div>
+          <div class="field"><label>Auto-generate auctions</label><select id="netAutoGenerate"><option value="">No change</option><option value="true">On</option><option value="false">Off</option></select></div>
+        </div>
+        <div class="toggle-row"><span>Restart running bots after apply</span><input id="netRestartRunning" type="checkbox" checked /></div>
+        <div class="toggle-row"><span>Include primary controller bot</span><input id="netIncludePrimary" type="checkbox" /></div>
+        <div class="btn-row">
+          <button class="primary" onclick="applyNetworkPolicy()">Apply Detailed Policy</button>
+          <button onclick="resetNetworkCommandForm()">Clear</button>
+        </div>
+      </details>
+    </div>
+
+    <div id="panel-seller" class="panel">
+      <div class="card" style="margin-bottom:14px">
+        <div style="display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap">
+          <div>
+            <h2 style="margin:0">Selling Bot Schedule</h2>
+            <p class="muted" style="margin:6px 0 0">Pre-load auctions and choose the exact time each one should open. For now this uses the primary seller bot.</p>
+          </div>
+          <div class="btn-row">
+            <button onclick="loadSellingSchedule(true)">Refresh</button>
+            <button class="success" onclick="runDueSellingSchedule()">Run Due Now</button>
+          </div>
+        </div>
+        <div class="fleet-grid">
+          <div class="fleet-tile"><strong id="sellTotal">0</strong><span class="muted">loaded</span></div>
+          <div class="fleet-tile"><strong id="sellPending">0</strong><span class="muted">pending</span></div>
+          <div class="fleet-tile"><strong id="sellCreated">0</strong><span class="muted">created</span></div>
+          <div class="fleet-tile"><strong id="sellFailed">0</strong><span class="muted">failed</span></div>
+        </div>
+        <div class="toggle-row"><span>Enable scheduled selling</span><input id="sellingScheduleEnabled" type="checkbox" onchange="markSellingDraftDirty()" /></div>
+        <div class="toggle-row"><span>Disable random generated selling while schedule is active</span><input id="sellingScheduleDisableGenerated" type="checkbox" checked onchange="markSellingDraftDirty()" /></div>
+        <div class="field" style="max-width:220px"><label>Template slots</label><input id="sellingTemplateCount" type="number" min="1" max="50" value="10" /></div>
+        <div class="btn-row">
+          <button class="primary" onclick="saveSellingSchedule()">Save Schedule</button>
+          <button onclick="createSellingTemplate()">Create Template</button>
+          <button onclick="addSellingSlot()">Add Slot</button>
+        </div>
+      </div>
+
+      <div class="card">
+        <div style="display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:10px">
+          <h2 style="margin:0">Preloaded Auctions</h2>
+          <div id="sellingScheduleMeta" class="muted">Loading...</div>
+        </div>
+        <div id="sellingScheduleList" class="bot-list-simple">Loading selling schedule...</div>
+      </div>
+    </div>
+
+    <div id="panel-winner" class="panel">
+      <div class="card">
+        <div style="display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap">
+          <div>
+            <h2 style="margin:0">Winner Dashboard</h2>
+            <p class="muted" style="margin:6px 0 0">See wins, sold auctions, refunds, and pending payout states across the primary bot and running worker bots.</p>
+          </div>
+          <div class="btn-row">
+            <button class="success" onclick="loadWinners()">Refresh Winners</button>
+            <button onclick="checkWinner()">Primary Only</button>
+          </div>
+        </div>
+        <div class="fleet-grid">
+          <div class="fleet-tile"><strong id="winWon">0</strong><span class="muted">won</span></div>
+          <div class="fleet-tile"><strong id="winSold">0</strong><span class="muted">sold</span></div>
+          <div class="fleet-tile"><strong id="winRefunds">0</strong><span class="muted">refunds</span></div>
+          <div class="fleet-tile"><strong id="winPending">0</strong><span class="muted">pending</span></div>
+        </div>
+        <div id="winnerResult" class="bot-list-simple" style="margin-top:12px">No winner scan yet.</div>
+      </div>
+    </div>
+
+    <div id="panel-logs" class="panel">
+      <div class="card">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
+          <h2 style="margin:0">Logs</h2>
+          <button onclick="document.getElementById('logs').innerHTML=''">Clear</button>
+        </div>
+        <div id="logs"></div>
+      </div>
+    </div>
+  </section>
+</main>
+
+<div id="toast" class="toast"></div>
+
+<script>
+const API = 'http://localhost:3002';
+const FACTORY_ADDRESS = '0xb61Cd17D498f82E9F22771254C31bCBBb5781540';
+const FACTORY_ABI = [
+  {
+    "inputs": [],
+    "name": "getDeployedCampaigns",
+    "outputs": [{ "internalType": "address payable[]", "name": "", "type": "address[]" }],
+    "stateMutability": "view",
+    "type": "function"
+  }
+];
+const CAMPAIGN_ABI = [
+  {
+    "inputs": [],
+    "name": "getSummary",
+    "outputs": [
+      { "internalType": "uint256", "name": "", "type": "uint256" },
+      { "internalType": "uint256", "name": "", "type": "uint256" },
+      { "internalType": "uint256", "name": "", "type": "uint256" },
+      { "internalType": "address", "name": "", "type": "address" },
+      { "internalType": "uint256", "name": "", "type": "uint256" },
+      { "internalType": "string", "name": "", "type": "string" },
+      { "internalType": "string", "name": "", "type": "string" },
+      { "internalType": "address", "name": "", "type": "address" },
+      { "internalType": "address[]", "name": "", "type": "address[]" },
+      { "internalType": "uint256", "name": "", "type": "uint256" }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "getStatus",
+    "outputs": [{ "internalType": "bool", "name": "", "type": "bool" }],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [{ "internalType": "address", "name": "bidder", "type": "address" }],
+    "name": "getBid",
+    "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
+    "stateMutability": "view",
+    "type": "function"
+  }
+];
+let statusPoll;
+let logPoll;
+let auctionPoll;
+let saveTimer;
+let isSavingConfig = false;
+let browserProvider;
+let browserAccount = null;
+let lastEnableSellingState = false;
+let currentBotWallet = null;
+let botPoll;
+let sellingPoll;
+let sellingDraftDirty = false;
+
+async function init() {
+  initializeScheduleBuilders();
+  await loadStatus();
+  await loadAuctions();
+  await loadBots();
+  await loadSellingSchedule();
+  startPolling();
+}
+
+function startPolling() {
+  clearInterval(statusPoll);
+  clearInterval(logPoll);
+  clearInterval(auctionPoll);
+  clearInterval(botPoll);
+  clearInterval(sellingPoll);
+  statusPoll = setInterval(loadStatus, 10000);
+  auctionPoll = setInterval(loadAuctions, 12000);
+  logPoll = setInterval(loadLogs, 3000);
+  botPoll = setInterval(loadBots, 10000);
+  sellingPoll = setInterval(loadSellingScheduleIfActive, 10000);
+}
+
+function initializeScheduleBuilders() {
+  syncScheduleBuilderFromInterval('cfg', '120');
+  syncScheduleBuilderFromInterval('bot', '120');
+  syncScheduleBuilderFromInterval('net', '');
+}
+
+function updateScheduleBuilder(prefix) {
+  const previewEl = document.getElementById(`${prefix}SchedulePreview`);
+  const intervalEl = document.getElementById(`${prefix}Interval`);
+  const allowBlank = prefix === 'net';
+  const minutesRaw = String(document.getElementById(`${prefix}ScheduleMinutes`).value || '').trim();
+  const secondsRaw = String(document.getElementById(`${prefix}ScheduleSeconds`).value || '').trim();
+
+  if (allowBlank && !minutesRaw && !secondsRaw) {
+    intervalEl.value = '';
+    previewEl.textContent = 'No interval change';
+    return;
+  }
+
+  const minutes = Math.max(0, Math.floor(Number(minutesRaw || '0')));
+  const seconds = Math.max(0, Math.min(59, Math.floor(Number(secondsRaw || '0'))));
+  const totalSeconds = Math.max(1, (minutes * 60) + seconds);
+
+  intervalEl.value = String(totalSeconds);
+  previewEl.textContent = `Every ${describeInterval(totalSeconds)}`;
+}
+
+function syncScheduleBuilderFromInterval(prefix, intervalSec) {
+  const parsed = parseIntervalForBuilder(intervalSec, prefix === 'net');
+  document.getElementById(`${prefix}ScheduleMinutes`).value = parsed.minutes;
+  document.getElementById(`${prefix}ScheduleSeconds`).value = parsed.seconds;
+  document.getElementById(`${prefix}Interval`).value = parsed.interval;
+  updateScheduleBuilder(prefix);
+}
+
+function parseIntervalForBuilder(intervalSec, allowBlank = false) {
+  const raw = String(intervalSec || '').trim();
+  if (!raw && allowBlank) {
+    return { minutes: '', seconds: '', interval: '' };
+  }
+  const totalSeconds = Math.max(1, Math.floor(Number(raw || '120')));
+  return {
+    minutes: String(Math.floor(totalSeconds / 60)),
+    seconds: String(totalSeconds % 60),
+    interval: String(totalSeconds),
+  };
+}
+
+function intervalFromCron(cron) {
+  const raw = String(cron || '').trim();
+  if (raw === '* * * * *') return '60';
+  const minuteMatch = raw.match(/^\*\/(\d+) \* \* \* \*$/);
+  if (minuteMatch) return String(Math.max(1, Number(minuteMatch[1])) * 60);
+  const hourMatch = raw.match(/^0 \*\/(\d+) \* \* \*$/);
+  if (hourMatch) return String(Math.max(1, Number(hourMatch[1])) * 3600);
+  return '';
+}
+
+function describeInterval(totalSeconds) {
+  const minutes = Math.floor(totalSeconds / 60);
+  const seconds = totalSeconds % 60;
+  const parts = [];
+  if (minutes) parts.push(`${minutes} minute${minutes === 1 ? '' : 's'}`);
+  if (seconds) parts.push(`${seconds} second${seconds === 1 ? '' : 's'}`);
+  return parts.join(' ') || '1 second';
+}
+
+async function loadStatus() {
+  try {
+    const status = await get('/api/status');
+    const balEl = document.getElementById('balETH');
+    const budgetEl = document.getElementById('budgetWei');
+    balEl.textContent = status.balanceETH;
+    balEl.title = status.balanceETH;
+    budgetEl.textContent = formatLargeInteger(status.budgetWei);
+    budgetEl.title = status.budgetWei;
+    document.getElementById('statBids').textContent = status.stats.bids;
+    document.getElementById('statCreated').textContent = status.stats.created;
+    document.getElementById('walletAddr').textContent = status.wallet;
+    document.getElementById('walletShort').textContent = `${status.wallet.slice(0, 6)}...${status.wallet.slice(-4)}`;
+    currentBotWallet = String(status.wallet || '').toLowerCase();
+    document.getElementById('statusDot').className = `dot ${status.botRunning ? 'on' : ''}`;
+    document.getElementById('modeBadge').textContent = status.config.BOT_MODE.toUpperCase();
+    document.getElementById('btnStart').disabled = status.botRunning;
+    document.getElementById('btnStop').disabled = !status.botRunning;
+    document.getElementById('lastCycle').textContent = status.lastCycle ? `Last cycle: ${new Date(status.lastCycle).toLocaleString()}` : 'Last cycle: never';
+    syncConfig(status.config);
+  } catch (err) {
+    console.warn(err);
+  }
+}
+
+function syncConfig(config) {
+  if (!isScheduleBuilderActive('cfg')) {
+    syncScheduleBuilderFromInterval('cfg', config.AUTO_TRADE_INTERVAL_SEC || intervalFromCron(config.AUTO_TRADE_CRON) || '120');
+  }
+  setValue('cfgMaxBid', config.MAX_BID_WEI);
+  setValue('cfgOutbid', '10');
+  setValue('cfgMaxMin', config.MAX_MIN_CONTRIBUTION_WEI);
+  setValue('cfgMinTime', config.MIN_TIME_REMAINING_SEC);
+  setChecked('cfgSkipWin', config.SKIP_IF_WINNING);
+  setChecked('cfgEnableBidding', config.ENABLE_BIDDING);
+  setChecked('cfgEnableSelling', config.ENABLE_SELLING);
+  setChecked('cfgEnableFinalize', config.ENABLE_FINALIZE);
+  if (!sellingDraftDirty) {
+    setChecked('sellingScheduleEnabled', config.SELLING_SCHEDULE_ENABLED);
+  }
+  setChecked('cfgAutoGenerate', config.AUTO_GENERATE_AUCTIONS);
+  setValue('cfgAutoGenerateCount', config.AUTO_GENERATE_COUNT);
+  setValue('cfgTargetActiveSellAuctions', config.TARGET_ACTIVE_SELL_AUCTIONS);
+  setValue('cfgMaxTotalSellAuctions', config.MAX_TOTAL_SELL_AUCTIONS);
+  lastEnableSellingState = String(config.ENABLE_SELLING) === 'true';
+}
+
+async function loadAuctions() {
+  try {
+    const auctions = await loadAuctionsViaBrowser();
+    document.getElementById('auctionMeta').textContent = `${auctions.length} total Â· ${auctions.filter((a) => a.isActive).length} open`;
+    renderAuctions(auctions);
+  } catch (err) {
+    console.warn(err);
+    const auctions = await get('/api/auctions');
+    document.getElementById('auctionMeta').textContent = `${auctions.length} total Â· ${auctions.filter((a) => a.isActive).length} open`;
+    renderAuctions(auctions);
+  }
+}
+
+async function refreshAuctions() {
+  try {
+    const auctions = await loadAuctionsViaBrowser(true);
+    document.getElementById('auctionMeta').textContent = `${auctions.length} total Â· ${auctions.filter((a) => a.isActive).length} open`;
+    renderAuctions(auctions);
+    toast('Auctions refreshed', 'ok');
+  } catch (err) {
+    console.warn(err);
+    const auctions = await get('/api/auctions?refresh=1');
+    document.getElementById('auctionMeta').textContent = `${auctions.length} total Â· ${auctions.filter((a) => a.isActive).length} open`;
+    renderAuctions(auctions);
+    toast('Refreshed via backend fallback', 'ok');
+  }
+}
+
+function renderAuctions(auctions) {
+  const tbody = document.getElementById('auctionBody');
+  if (!auctions.length) {
+    tbody.innerHTML = '<tr><td colspan="6" class="muted">No auctions loaded.</td></tr>';
+    return;
+  }
+
+  tbody.innerHTML = [...auctions].reverse().map((auction) => {
+    const status = auction.isActive
+      ? `<span class="pill open">${formatTime(auction.secondsLeft)}</span>`
+      : `<span class="pill closed">Closed</span>`;
+    const myBid = auction.amIWinning
+      ? `<span class="pill winning">Winning ${auction.myBid}</span>`
+      : auction.amIBidding
+        ? `${auction.myBid} wei`
+        : auction.isManager
+          ? '<span class="pill mine">Yours</span>'
+          : '-';
+
+    const actions = [];
+    if (auction.isActive && !auction.isManager) {
+      actions.push(`<button class="primary" onclick="quickBid('${auction.address}', '${auction.highestBid}', '${auction.minimumContribution}', ${auction.approversCount})">Bid</button>`);
+    }
+    if (!auction.isActive && !auction.closed && auction.isManager && auction.approversCount > 0) {
+      actions.push(`<button class="success" onclick="finalize('${auction.address}')">Finalize</button>`);
+    }
+
+    return `
+      <tr>
+        <td><div>${escapeHtml(auction.dataDescription || '-')}</div><div class="mono">${auction.address.slice(0, 10)}...</div></td>
+        <td>${status}</td>
+        <td>${formatAuctionDate(auction)}</td>
+        <td>${auction.highestBid} wei</td>
+        <td>${myBid}</td>
+        <td>${actions.join(' ') || '-'}</td>
+      </tr>
+    `;
+  }).join('');
+}
+
+async function loadSellingScheduleIfActive() {
+  if (!document.getElementById('panel-seller').classList.contains('active')) return;
+  await loadSellingSchedule();
+}
+
+async function loadSellingSchedule(force = false) {
+  if (sellingDraftDirty && !force) {
+    document.getElementById('sellingScheduleMeta').textContent = 'Unsaved changes - save or refresh to reload';
+    return;
+  }
+
+  if (sellingDraftDirty && force && !confirm('Reload schedule from disk and discard unsaved edits?')) {
+    return;
+  }
+
+  try {
+    const result = await get('/api/selling-schedule');
+    if (!result.ok) throw new Error(result.error || 'Selling schedule failed to load');
+    window.__sellingSchedule = result.items || [];
+    sellingDraftDirty = false;
+    setChecked('sellingScheduleEnabled', result.config?.SELLING_SCHEDULE_ENABLED);
+    document.getElementById('sellingScheduleDisableGenerated').checked = String(result.config?.AUTO_GENERATE_AUCTIONS) === 'false';
+    renderSellingSchedule(window.__sellingSchedule);
+  } catch (err) {
+    document.getElementById('sellingScheduleMeta').textContent = err.message;
+  }
+}
+
+function renderSellingSchedule(items = []) {
+  const total = items.length;
+  const pending = items.filter((item) => item.status !== 'created' && item.status !== 'failed').length;
+  const created = items.filter((item) => item.status === 'created').length;
+  const failed = items.filter((item) => item.status === 'failed').length;
+
+  document.getElementById('sellTotal').textContent = total;
+  document.getElementById('sellPending').textContent = pending;
+  document.getElementById('sellCreated').textContent = created;
+  document.getElementById('sellFailed').textContent = failed;
+  document.getElementById('sellingScheduleMeta').textContent = `${total} loaded · ${pending} pending · ${created} created`;
+
+  const list = document.getElementById('sellingScheduleList');
+  if (!items.length) {
+    list.innerHTML = '<div class="muted">No scheduled auctions yet. Create a 10-slot template to start.</div>';
+    return;
+  }
+
+  list.innerHTML = items.map((item, index) => {
+    const statusClass = item.status === 'created' ? 'open' : item.status === 'failed' ? 'closed' : 'mine';
+    const dueText = new Date(item.startAt).getTime() <= Date.now() && item.status !== 'created' ? 'due now' : 'scheduled';
+    return `
+      <div class="seller-row" data-selling-id="${escapeAttr(item.id)}">
+        <div class="seller-row-head">
+          <div>
+            <strong>Auction ${index + 1}</strong>
+            <span class="pill ${statusClass}">${escapeHtml(item.status || 'pending')}</span>
+            <span class="pill closed">${escapeHtml(dueText)}</span>
+            ${item.createdAddress ? `<span class="pill open">${shortAddress(item.createdAddress)}</span>` : ''}
+          </div>
+          <div class="btn-row">
+            <button onclick="duplicateSellingSlot(${index})">Duplicate</button>
+            <button class="warning" onclick="removeSellingSlot(${index})">Remove</button>
+          </div>
+        </div>
+        <div class="seller-grid">
+          <div class="field"><label>Description</label><input data-sell-field="dataDescription" value="${escapeAttr(item.dataDescription)}" oninput="markSellingDraftDirty()" /></div>
+          <div class="field"><label>Start time</label><input data-sell-field="startAt" type="datetime-local" value="${formatDateTimeLocal(item.startAt)}" onchange="markSellingDraftDirty()" /></div>
+          <div class="field"><label>Min bid wei</label><input data-sell-field="minimumContribution" type="number" min="1" value="${escapeAttr(item.minimumContribution)}" oninput="markSellingDraftDirty()" /></div>
+          <div class="field"><label>Duration minutes</label><input data-sell-field="auctionDuration" type="number" min="1" max="30" value="${escapeAttr(item.auctionDuration)}" oninput="markSellingDraftDirty()" /></div>
+          <div class="field seller-wide"><label>Data sold when this auction is finalized</label><textarea data-sell-field="dataForSell" oninput="markSellingDraftDirty()">${escapeHtml(item.dataForSell)}</textarea></div>
+        </div>
+        <label class="mini-toggle" style="max-width:180px">Enabled <input data-sell-field="enabled" type="checkbox" ${item.enabled !== false ? 'checked' : ''} onchange="markSellingDraftDirty()" /></label>
+        ${item.error ? `<div class="mono" style="color:#fca5a5">${escapeHtml(item.error)}</div>` : ''}
+      </div>
+    `;
+  }).join('');
+}
+
+async function saveSellingSchedule() {
+  const items = collectSellingSchedule();
+  if (!items.length) {
+    toast('Add at least one scheduled auction first', 'err');
+    return false;
+  }
+  const result = await post('/api/selling-schedule', {
+    items,
+    enableSchedule: document.getElementById('sellingScheduleEnabled').checked ? 'true' : 'false',
+    disableGenerated: document.getElementById('sellingScheduleDisableGenerated').checked ? 'true' : 'false',
+  });
+  if (result.ok) {
+    toast(`Selling schedule saved (${result.items.length} auctions)`, 'ok');
+    window.__sellingSchedule = result.items;
+    sellingDraftDirty = false;
+    renderSellingSchedule(result.items);
+    loadStatus();
+    return true;
+  } else {
+    toast(result.error || 'Schedule save failed', 'err');
+    return false;
+  }
+}
+
+async function createSellingTemplate() {
+  const count = Number(document.getElementById('sellingTemplateCount').value || '10');
+  if (!count) return;
+  const result = await post('/api/selling-schedule/template', { count });
+  if (result.ok) {
+    window.__sellingSchedule = result.items;
+    sellingDraftDirty = false;
+    document.getElementById('sellingScheduleEnabled').checked = true;
+    renderSellingSchedule(result.items);
+    toast(`Created ${result.items.length} scheduled slots`, 'ok');
+  } else {
+    toast(result.error || 'Template failed', 'err');
+  }
+}
+
+async function runDueSellingSchedule() {
+  const saved = await saveSellingSchedule();
+  if (!saved) return;
+  const result = await post('/api/selling-schedule/run-due', { force: 'true' });
+  if (result.ok) {
+    const created = result.results.filter((item) => item.success).length;
+    const failed = result.results.filter((item) => !item.success).length;
+    window.__sellingSchedule = result.items || window.__sellingSchedule;
+    renderSellingSchedule(window.__sellingSchedule);
+    toast(`Due run complete: ${created} created${failed ? `, ${failed} failed` : ''}`, failed ? 'err' : 'ok');
+    loadAuctions();
+  } else {
+    toast(result.error || 'Due run failed', 'err');
+  }
+}
+
+function addSellingSlot() {
+  const items = collectSellingSchedule();
+  const last = items[items.length - 1] || {};
+  items.push({
+    id: `ui-${Date.now().toString(36)}`,
+    enabled: true,
+    startAt: new Date(Date.now() + 5 * 60 * 1000).toISOString(),
+    minimumContribution: last.minimumContribution || 100,
+    auctionDuration: last.auctionDuration || 10,
+    dataDescription: '',
+    dataForSell: '',
+    status: 'pending',
+  });
+  window.__sellingSchedule = items;
+  sellingDraftDirty = true;
+  renderSellingSchedule(items);
+}
+
+function duplicateSellingSlot(index) {
+  const items = collectSellingSchedule();
+  const source = items[index];
+  if (!source) return;
+  items.splice(index + 1, 0, {
+    ...source,
+    id: `ui-${Date.now().toString(36)}`,
+    status: 'pending',
+    createdAt: '',
+    createdAddress: '',
+    error: '',
+  });
+  window.__sellingSchedule = items;
+  sellingDraftDirty = true;
+  renderSellingSchedule(items);
+}
+
+function removeSellingSlot(index) {
+  const items = collectSellingSchedule();
+  items.splice(index, 1);
+  window.__sellingSchedule = items;
+  sellingDraftDirty = true;
+  renderSellingSchedule(items);
+}
+
+function collectSellingSchedule() {
+  const existing = window.__sellingSchedule || [];
+  const existingById = new Map(existing.map((item) => [String(item.id), item]));
+  return Array.from(document.querySelectorAll('[data-selling-id]')).map((row, index) => {
+    const rowId = row.dataset.sellingId || '';
+    const previous = existingById.get(rowId) || existing[index] || {};
+    const field = (name) => row.querySelector(`[data-sell-field="${name}"]`);
+    const startInput = field('startAt').value;
+    const startAt = startInput ? new Date(startInput).toISOString() : new Date().toISOString();
+    return {
+      ...previous,
+      id: row.dataset.sellingId || previous.id || `ui-${Date.now().toString(36)}-${index}`,
+      enabled: field('enabled').checked,
+      startAt,
+      minimumContribution: field('minimumContribution').value,
+      auctionDuration: field('auctionDuration').value,
+      dataDescription: field('dataDescription').value,
+      dataForSell: field('dataForSell').value,
+      status: previous.status === 'created' ? 'created' : 'pending',
+    };
+  });
+}
+
+function markSellingDraftDirty() {
+  sellingDraftDirty = true;
+  const count = document.querySelectorAll('[data-selling-id]').length;
+  document.getElementById('sellingScheduleMeta').textContent = `${count} loaded · unsaved changes`;
+}
+
+async function saveConfig() {
+  if (isSavingConfig) return;
+  updateScheduleBuilder('cfg');
+  const enableSellingNow = document.getElementById('cfgEnableSelling').checked;
+  const justEnabledSelling = !lastEnableSellingState && enableSellingNow;
+  const payload = {
+    BOT_MODE: 'auto',
+    TRADING_PROFILE: 'balanced',
+    AUTO_TRADE_INTERVAL_SEC: document.getElementById('cfgInterval').value,
+    MAX_BID_WEI: document.getElementById('cfgMaxBid').value,
+    OUTBID_BY_WEI: '10',
+    MAX_MIN_CONTRIBUTION_WEI: document.getElementById('cfgMaxMin').value,
+    MIN_TIME_REMAINING_SEC: document.getElementById('cfgMinTime').value,
+    SKIP_IF_WINNING: document.getElementById('cfgSkipWin').checked ? 'true' : 'false',
+    AUTO_CREATE_AUCTIONS: 'true',
+    ENABLE_BIDDING: document.getElementById('cfgEnableBidding').checked ? 'true' : 'false',
+    ENABLE_SELLING: document.getElementById('cfgEnableSelling').checked ? 'true' : 'false',
+    ENABLE_FINALIZE: document.getElementById('cfgEnableFinalize').checked ? 'true' : 'false',
+    AUTO_GENERATE_AUCTIONS: document.getElementById('cfgAutoGenerate').checked ? 'true' : 'false',
+    AUTO_GENERATE_COUNT: document.getElementById('cfgAutoGenerateCount').value,
+    TARGET_ACTIVE_SELL_AUCTIONS: document.getElementById('cfgTargetActiveSellAuctions').value,
+    MAX_TOTAL_SELL_AUCTIONS: document.getElementById('cfgMaxTotalSellAuctions').value
+  };
+  try {
+    isSavingConfig = true;
+    await post('/api/config', payload);
+    lastEnableSellingState = enableSellingNow;
+    toast('Config saved', 'ok');
+    if (justEnabledSelling) {
+      const seedRes = await post('/api/seed-selling', {
+        count: document.getElementById('cfgTargetActiveSellAuctions').value || '1'
+      });
+      if (seedRes.ok) {
+        const created = seedRes.results.filter((item) => item.success).length;
+        toast(`Selling enabled and ${created} auction(s) created`, 'ok');
+      } else {
+        toast(`Selling enabled but create failed: ${seedRes.error}`, 'err');
+      }
+      await post('/api/run-once', {});
+      setTimeout(() => { loadStatus(); loadAuctions(); }, 1500);
+    }
+  } catch (err) {
+    toast(err.message, 'err');
+  } finally {
+    isSavingConfig = false;
+  }
+}
+
+async function loadAuctionsViaBrowser(force = false) {
+  if (!window.ethereum || !window.ethers) {
+    throw new Error('Browser wallet provider unavailable');
+  }
+
+  const chainId = await window.ethereum.request({ method: 'eth_chainId' });
+  if (chainId !== '0xaa36a7') {
+    try {
+      await window.ethereum.request({
+        method: 'wallet_switchEthereumChain',
+        params: [{ chainId: '0xaa36a7' }]
+      });
+    } catch (err) {
+      throw new Error('MetaMask must be connected to Sepolia');
+    }
+  }
+
+  if (!browserProvider || force) {
+    browserProvider = new window.ethers.BrowserProvider(window.ethereum);
+  }
+
+  const accounts = await window.ethereum.request({ method: 'eth_accounts' });
+  browserAccount = accounts[0] ? accounts[0].toLowerCase() : null;
+  const viewAccount = currentBotWallet || browserAccount;
+
+  const factory = new window.ethers.Contract(FACTORY_ADDRESS, FACTORY_ABI, browserProvider);
+  const addresses = await factory.getDeployedCampaigns();
+  const now = Math.floor(Date.now() / 1000);
+  const results = [];
+  const batchSize = 6;
+
+  for (let i = 0; i < addresses.length; i += batchSize) {
+    const batch = addresses.slice(i, i + batchSize);
+    const batchRows = await Promise.all(batch.map(async (address) => {
+      try {
+        const campaign = new window.ethers.Contract(address, CAMPAIGN_ABI, browserProvider);
+        const summary = await campaign.getSummary();
+        let closed = false;
+        try {
+          closed = await campaign.getStatus();
+        } catch (_) {}
+
+        const manager = String(summary[3] || '');
+        const highestBidder = String(summary[7] || '');
+        const endTimeSec = Number(summary[9] || 0);
+        const isActive = endTimeSec > now;
+        let myBid = 0n;
+        if (viewAccount && isActive) {
+          try {
+            myBid = BigInt(await campaign.getBid(viewAccount));
+          } catch (_) {}
+        }
+        const amIBidding = myBid > 0n;
+        const amIWinning = viewAccount ? highestBidder.toLowerCase() === viewAccount && isActive : false;
+
+        return {
+          address,
+          minimumContribution: String(summary[0] || '0'),
+          highestBid: String(summary[4] || '0'),
+          approversCount: Number(summary[2] || 0),
+          dataForSell: String(summary[5] || ''),
+          dataDescription: String(summary[6] || '(no description)'),
+          endTimeSec,
+          secondsLeft: Math.max(0, endTimeSec - now),
+          isActive,
+          isManager: viewAccount ? manager.toLowerCase() === viewAccount : false,
+          isWinner: viewAccount ? highestBidder.toLowerCase() === viewAccount : false,
+          amIBidding,
+          amIWinning,
+          myBid: myBid.toString(),
+          closed: Boolean(closed),
+        };
+      } catch (err) {
+        return {
+          address,
+          minimumContribution: '0',
+          highestBid: '0',
+          approversCount: 0,
+          dataForSell: '',
+          dataDescription: '(failed to load details)',
+          endTimeSec: 0,
+          secondsLeft: 0,
+          isActive: false,
+          isManager: false,
+          isWinner: false,
+          amIBidding: false,
+          amIWinning: false,
+          myBid: '0',
+          closed: false,
+        };
+      }
+    }));
+    results.push(...batchRows);
+  }
+
+  return results;
+}
+
+function queueSaveConfig() {
+  clearTimeout(saveTimer);
+  saveTimer = setTimeout(saveConfig, 250);
+}
+
+async function botStart() {
+  await saveConfig();
+  await post('/api/start', {});
+  toast('Bot started', 'ok');
+  loadStatus();
+}
+
+async function botStop() {
+  await post('/api/stop', {});
+  toast('Bot stopped', 'ok');
+  loadStatus();
+}
+
+async function runOnce() {
+  await post('/api/run-once', {});
+  toast('Cycle triggered', 'ok');
+  setTimeout(() => { loadStatus(); loadAuctions(); }, 2000);
+}
+
+async function quickBid(address, highestBid, minimumContribution, bidderCount) {
+  const suggested = bidderCount === 0
+    ? Number(minimumContribution)
+    : Number(highestBid) + Number(document.getElementById('cfgOutbid').value || 100);
+  const amount = prompt(`Bid on ${address.slice(0, 10)}...\nSuggested: ${suggested} wei`, suggested);
+  if (!amount) return;
+  const result = await post('/api/bid', { address, amountWei: amount });
+  if (result.ok) {
+    toast(`Bid placed: ${result.tx.slice(0, 12)}...`, 'ok');
+    loadAuctions();
+  } else {
+    toast(result.error, 'err');
+  }
+}
+
+async function finalize(address) {
+  if (!confirm(`Finalize ${address.slice(0, 10)}...?`)) return;
+  const result = await post('/api/finalize', { address });
+  if (result.ok) {
+    toast('Auction finalized', 'ok');
+    loadAuctions();
+  } else {
+    toast(result.error, 'err');
+  }
+}
+
+async function checkWinner() {
+  const el = document.getElementById('winnerResult');
+  el.textContent = 'Checking primary bot...';
+  const result = await post('/api/check-winner', {});
+  if (!result.ok) {
+    el.textContent = result.error;
+    return;
+  }
+  renderWinnerReports({
+    summary: summarizeWinnerReports([result.results]),
+    reports: [result.results],
+  });
+}
+
+async function loadWinners() {
+  const el = document.getElementById('winnerResult');
+  el.textContent = 'Scanning winners across running bots...';
+  const result = await get('/api/winners');
+  if (!result.ok) {
+    el.textContent = result.error || 'Winner scan failed';
+    return;
+  }
+  renderWinnerReports(result);
+}
+
+function renderWinnerReports(result) {
+  const reports = result.reports || [];
+  const summary = result.summary || summarizeWinnerReports(reports);
+  document.getElementById('winWon').textContent = summary.won || 0;
+  document.getElementById('winSold').textContent = summary.sold || 0;
+  document.getElementById('winRefunds').textContent = summary.refunded || 0;
+  document.getElementById('winPending').textContent = summary.awaitingRefund || 0;
+
+  const el = document.getElementById('winnerResult');
+  if (!reports.length) {
+    el.innerHTML = '<div class="muted">No bots reported yet.</div>';
+    return;
+  }
+
+  el.innerHTML = reports.map((report) => {
+    const wallet = report.wallet ? shortAddress(report.wallet) : 'wallet unknown';
+    const error = report.error ? `<div class="mono" style="color:#fca5a5">${escapeHtml(report.error)}</div>` : '';
+    return `
+      <div class="bot-compact">
+        <div class="bot-compact-head">
+          <div>
+            <div class="bot-name">${escapeHtml(report.owner || 'Bot')}</div>
+            <div class="bot-meta">
+              <span class="pill mine">${escapeHtml(wallet)}</span>
+              <span class="pill open">won ${report.won?.length || 0}</span>
+              <span class="pill closed">sold ${report.sold?.length || 0}</span>
+              <span class="pill closed">pending ${report.awaitingRefund?.length || 0}</span>
+            </div>
+            ${error}
+          </div>
+        </div>
+        ${renderWinnerGroup('Won', report.won, 'data')}
+        ${renderWinnerGroup('Sold', report.sold, 'earned')}
+        ${renderWinnerGroup('Awaiting Refund', report.awaitingRefund, 'amount')}
+        ${renderWinnerGroup('Refunded', report.refunded, '')}
+      </div>
+    `;
+  }).join('');
+}
+
+function renderWinnerGroup(title, items = [], valueKey = '') {
+  if (!items.length) return '';
+  return `
+    <div style="margin-top:10px">
+      <div class="mono" style="color:#cbd5e1">${escapeHtml(title)}</div>
+      ${items.map((item) => `
+        <div class="stat" style="margin-top:6px">
+          <div>${escapeHtml(item.description || item.address || 'Auction')}</div>
+          <div class="mono">${shortAddress(item.address || '')}${item.pending ? ' · pending finalize' : ''}</div>
+          ${valueKey && item[valueKey] ? `<div class="mono">${escapeHtml(valueKey)}: ${escapeHtml(String(item[valueKey]).slice(0, 180))}</div>` : ''}
+          ${item.error ? `<div class="mono" style="color:#fca5a5">${escapeHtml(item.error)}</div>` : ''}
+        </div>
+      `).join('')}
+    </div>
+  `;
+}
+
+function summarizeWinnerReports(reports = []) {
+  return reports.reduce((summary, report) => {
+    summary.won += report.won?.length || 0;
+    summary.sold += report.sold?.length || 0;
+    summary.refunded += report.refunded?.length || 0;
+    summary.awaitingRefund += report.awaitingRefund?.length || 0;
+    return summary;
+  }, { won: 0, sold: 0, refunded: 0, awaitingRefund: 0 });
+}
+
+async function loadBots() {
+  const response = await get('/api/bots');
+  const bots = response.bots || [];
+  const summary = response.summary || {};
+  window.__botCache = bots;
+
+  document.getElementById('botSummary').textContent = [
+    `${summary.registered ?? bots.length} registered`,
+    `${summary.enabled ?? bots.filter((bot) => bot.enabled).length} enabled`,
+    `${summary.running ?? bots.filter((bot) => bot.status === 'running').length} running`,
+    `bids ${summary.bids ?? 0}`,
+    `created ${summary.created ?? 0}`,
+    `errors ${summary.errors ?? 0}`,
+  ].join(' · ');
+  document.getElementById('fleetRegistered').textContent = summary.registered ?? bots.length;
+  document.getElementById('fleetRunning').textContent = summary.running ?? bots.filter((bot) => bot.status === 'running').length;
+  document.getElementById('fleetBids').textContent = summary.bids ?? 0;
+  document.getElementById('fleetErrors').textContent = summary.errors ?? 0;
+
+  const list = document.getElementById('botList');
+  if (!bots.length) {
+    list.innerHTML = '<div class="muted" style="margin-top:12px">No extra bots added yet. Click Add Bot to register one.</div>';
+    return;
+  }
+
+  list.innerHTML = bots.map((bot) => {
+    const statePill = `<span class="pill ${bot.status === 'running' ? 'open' : 'closed'}">${escapeHtml(bot.status)}</span>`;
+    const enabledPill = `<span class="pill ${bot.enabled ? 'mine' : 'closed'}">${bot.enabled ? 'enabled' : 'disabled'}</span>`;
+    const wallet = bot.wallet ? `<div class="mono">${shortAddress(bot.wallet)}</div>` : '<div class="mono">wallet not loaded</div>';
+    const error = bot.lastError ? `<div class="mono" style="color:#fca5a5">${escapeHtml(bot.lastError)}</div>` : '';
+    const stats = bot.stats
+      ? `<div class="mono">cycles ${bot.stats.cycles || 0} · bids ${bot.stats.bids || 0} · created ${bot.stats.created || 0}</div>`
+      : '';
+    const overrides = bot.overrides || {};
+    const bidding = String(overrides.ENABLE_BIDDING ?? 'true') !== 'false';
+    const selling = String(overrides.ENABLE_SELLING ?? 'true') !== 'false';
+    const finalize = String(overrides.ENABLE_FINALIZE ?? 'true') !== 'false';
+    const interval = describeInterval(Number(overrides.AUTO_TRADE_INTERVAL_SEC || intervalFromCron(overrides.AUTO_TRADE_CRON) || 120));
+    return `
+      <div class="bot-compact">
+        <div class="bot-compact-head">
+          <div>
+            <div class="bot-name">${escapeHtml(bot.name)}</div>
+            <div class="bot-meta">${statePill}${enabledPill}<span class="pill closed">${escapeHtml(interval)}</span></div>
+            ${wallet}
+            ${stats}
+            ${bot.lastCycleAt ? `<div class="mono">last cycle ${new Date(bot.lastCycleAt).toLocaleString()}</div>` : ''}
+            ${error}
+          </div>
+          <div class="bot-actions">
+            <button class="success" onclick="startBotProfile('${bot.id}')">Start</button>
+            <button onclick="runBotProfile('${bot.id}')">Run</button>
+            <button class="danger" onclick="stopBotProfile('${bot.id}')">Stop</button>
+            <button class="primary" onclick="editBot('${bot.id}')">Settings</button>
+          </div>
+        </div>
+        <div class="bot-switches">
+          <label class="mini-toggle">Enabled <input type="checkbox" ${bot.enabled !== false ? 'checked' : ''} onchange="quickUpdateBot('${bot.id}', { enabled: this.checked ? 'true' : 'false' })" /></label>
+          <label class="mini-toggle">Bid <input type="checkbox" ${bidding ? 'checked' : ''} onchange="quickUpdateBot('${bot.id}', { overrides: { ENABLE_BIDDING: this.checked ? 'true' : 'false' } }, true)" /></label>
+          <label class="mini-toggle">Sell <input type="checkbox" ${selling ? 'checked' : ''} onchange="quickUpdateBot('${bot.id}', { overrides: { ENABLE_SELLING: this.checked ? 'true' : 'false' } }, true)" /></label>
+        </div>
+        <div class="quickbar">
+          <label class="mini-toggle" style="max-width:160px">Finalize <input type="checkbox" ${finalize ? 'checked' : ''} onchange="quickUpdateBot('${bot.id}', { overrides: { ENABLE_FINALIZE: this.checked ? 'true' : 'false' } }, true)" /></label>
+          <button class="warning" onclick="deleteBotProfile('${bot.id}')">Delete</button>
+        </div>
+      </div>
+    `;
+  }).join('');
+}
+function resetNetworkCommandForm() {
+  document.getElementById('netScope').value = 'all';
+  document.getElementById('netTradingProfile').value = '';
+  syncScheduleBuilderFromInterval('net', '');
+  document.getElementById('netMaxBid').value = '';
+  document.getElementById('netOutbid').value = '10';
+  document.getElementById('netTargetActive').value = '';
+  document.getElementById('netMaxTotal').value = '';
+  document.getElementById('netGenerateCount').value = '';
+  document.getElementById('netEnabled').value = '';
+  document.getElementById('netEnableBidding').value = '';
+  document.getElementById('netEnableSelling').value = '';
+  document.getElementById('netEnableFinalize').value = '';
+  document.getElementById('netAutoGenerate').value = '';
+  document.getElementById('netRestartRunning').checked = true;
+  document.getElementById('netIncludePrimary').checked = false;
+}
+
+function toggleBotEditor() {
+  const box = document.getElementById('botEditorBox');
+  box.open = true;
+  resetBotForm();
+  document.getElementById('botName').focus();
+}
+
+async function quickUpdateBot(id, patch = {}, restartIfRunning = false) {
+  const bot = (window.__botCache || []).find((item) => item.id === id);
+  if (!bot) return;
+
+  const payload = {
+    id,
+    name: bot.name,
+    enabled: patch.enabled ?? String(bot.enabled !== false),
+    overrides: {
+      ...(bot.overrides || {}),
+      ...(patch.overrides || {}),
+    },
+  };
+
+  const wasRunning = bot.status === 'running';
+  const result = await post('/api/bots', payload);
+  if (!result.ok) {
+    toast(result.error || 'Bot update failed', 'err');
+    loadBots();
+    return;
+  }
+
+  if (restartIfRunning && wasRunning) {
+    await stopBotProfile(id);
+    await startBotProfile(id);
+  } else {
+    toast('Bot updated', 'ok');
+    loadBots();
+  }
+}
+
+async function fleetPreset(name) {
+  const presets = {
+    pause: {
+      label: 'Paused bidding',
+      overrides: { ENABLE_BIDDING: 'false' },
+    },
+    auto: {
+      label: 'Auto mode: bid and sell',
+      overrides: { ENABLE_BIDDING: 'true', ENABLE_SELLING: 'true', ENABLE_FINALIZE: 'true' },
+    },
+    bid: {
+      label: 'Bidding only',
+      overrides: { ENABLE_BIDDING: 'true', ENABLE_SELLING: 'false', ENABLE_FINALIZE: 'true' },
+    },
+    sell: {
+      label: 'Selling only',
+      overrides: { ENABLE_BIDDING: 'false', ENABLE_SELLING: 'true', ENABLE_FINALIZE: 'true' },
+    },
+  };
+  const preset = presets[name];
+  if (!preset) return;
+
+  const result = await post('/api/bots/orchestrate', {
+    scope: 'all',
+    restartRunning: 'true',
+    includePrimary: 'true',
+    overrides: preset.overrides,
+  });
+  toast(result.ok ? preset.label : (result.error || 'Fleet command failed'), result.ok ? 'ok' : 'err');
+  loadBots();
+}
+
+async function applyNetworkPolicy(custom = null) {
+  updateScheduleBuilder('net');
+  const payload = custom || {
+    scope: document.getElementById('netScope').value,
+    restartRunning: document.getElementById('netRestartRunning').checked ? 'true' : 'false',
+    includePrimary: document.getElementById('netIncludePrimary').checked ? 'true' : 'false',
+    enabled: selectOptionalValue('netEnabled'),
+    overrides: {
+      AUTO_TRADE_INTERVAL_SEC: selectOptionalValue('netInterval'),
+      TRADING_PROFILE: selectOptionalValue('netTradingProfile'),
+      MAX_BID_WEI: selectOptionalValue('netMaxBid'),
+      OUTBID_BY_WEI: '10',
+      TARGET_ACTIVE_SELL_AUCTIONS: selectOptionalValue('netTargetActive'),
+      MAX_TOTAL_SELL_AUCTIONS: selectOptionalValue('netMaxTotal'),
+      AUTO_GENERATE_COUNT: selectOptionalValue('netGenerateCount'),
+      ENABLE_BIDDING: selectOptionalValue('netEnableBidding'),
+      ENABLE_SELLING: selectOptionalValue('netEnableSelling'),
+      ENABLE_FINALIZE: selectOptionalValue('netEnableFinalize'),
+      AUTO_GENERATE_AUCTIONS: selectOptionalValue('netAutoGenerate'),
+    }
+  };
+
+  const result = await post('/api/bots/orchestrate', payload);
+  if (result.ok) {
+    const primaryNote = result.primaryUpdated ? ', primary updated' : '';
+    toast(`Updated ${result.updated} bot(s)${result.restarted ? `, restarted ${result.restarted}` : ''}${primaryNote}`, 'ok');
+  } else {
+    toast(result.error || 'Broadcast failed', 'err');
+  }
+  loadBots();
+}
+
+async function applyNetworkPreset(name) {
+  const scope = document.getElementById('netScope').value;
+  const restartRunning = document.getElementById('netRestartRunning').checked ? 'true' : 'false';
+  const includePrimary = document.getElementById('netIncludePrimary').checked ? 'true' : 'false';
+  const presets = {
+    'pause-bidding': {
+      scope,
+      restartRunning,
+      includePrimary,
+      overrides: { ENABLE_BIDDING: 'false' },
+    },
+    'buy-wave': {
+      scope,
+      restartRunning,
+      includePrimary,
+      overrides: {
+        ENABLE_BIDDING: 'true',
+        ENABLE_SELLING: 'false',
+        ENABLE_FINALIZE: 'true',
+      },
+    },
+    'sell-wave': {
+      scope,
+      restartRunning,
+      includePrimary,
+      overrides: {
+        ENABLE_BIDDING: 'false',
+        ENABLE_SELLING: 'true',
+        ENABLE_FINALIZE: 'true',
+      },
+    },
+  };
+
+  const payload = presets[name];
+  if (!payload) return;
+  await applyNetworkPolicy(payload);
+}
+
+function editBot(id) {
+  const bot = (window.__botCache || []).find((item) => item.id === id);
+  if (!bot) return;
+  document.getElementById('botEditorBox').open = true;
+  document.getElementById('botId').value = bot.id;
+  document.getElementById('botName').value = bot.name || '';
+  document.getElementById('botPrivateKey').value = '';
+  syncScheduleBuilderFromInterval('bot', bot.overrides.AUTO_TRADE_INTERVAL_SEC || intervalFromCron(bot.overrides.AUTO_TRADE_CRON) || '120');
+  document.getElementById('botTradingProfile').value = bot.overrides.TRADING_PROFILE || 'balanced';
+  document.getElementById('botMaxBid').value = bot.overrides.MAX_BID_WEI || '';
+  document.getElementById('botTargetAuctions').value = bot.overrides.TARGET_ACTIVE_SELL_AUCTIONS || '';
+  document.getElementById('botMaxTotalAuctions').value = bot.overrides.MAX_TOTAL_SELL_AUCTIONS || '';
+  document.getElementById('botGenerateCount').value = bot.overrides.AUTO_GENERATE_COUNT || '';
+  document.getElementById('botEnabled').checked = bot.enabled !== false;
+  document.getElementById('botEnableBidding').checked = String(bot.overrides.ENABLE_BIDDING || 'true') !== 'false';
+  document.getElementById('botEnableSelling').checked = String(bot.overrides.ENABLE_SELLING || 'true') !== 'false';
+  document.getElementById('botEnableFinalize').checked = String(bot.overrides.ENABLE_FINALIZE || 'true') !== 'false';
+  document.getElementById('botAutoGenerate').checked = String(bot.overrides.AUTO_GENERATE_AUCTIONS || 'true') !== 'false';
+  document.getElementById('botName').focus();
+}
+
+function resetBotForm() {
+  document.getElementById('botId').value = '';
+  document.getElementById('botName').value = '';
+  document.getElementById('botPrivateKey').value = '';
+  syncScheduleBuilderFromInterval('bot', '120');
+  document.getElementById('botTradingProfile').value = 'balanced';
+  document.getElementById('botMaxBid').value = '';
+  document.getElementById('botTargetAuctions').value = '';
+  document.getElementById('botMaxTotalAuctions').value = '';
+  document.getElementById('botGenerateCount').value = '';
+  document.getElementById('botEnabled').checked = true;
+  document.getElementById('botEnableBidding').checked = true;
+  document.getElementById('botEnableSelling').checked = true;
+  document.getElementById('botEnableFinalize').checked = true;
+  document.getElementById('botAutoGenerate').checked = true;
+}
+
+async function saveBotProfile() {
+  updateScheduleBuilder('bot');
+  const payload = {
+    id: document.getElementById('botId').value || undefined,
+    name: document.getElementById('botName').value,
+    privateKey: document.getElementById('botPrivateKey').value || undefined,
+    enabled: document.getElementById('botEnabled').checked ? 'true' : 'false',
+    overrides: {
+      AUTO_TRADE_INTERVAL_SEC: document.getElementById('botInterval').value,
+      TRADING_PROFILE: document.getElementById('botTradingProfile').value,
+      MAX_BID_WEI: document.getElementById('botMaxBid').value,
+      TARGET_ACTIVE_SELL_AUCTIONS: document.getElementById('botTargetAuctions').value,
+      MAX_TOTAL_SELL_AUCTIONS: document.getElementById('botMaxTotalAuctions').value,
+      AUTO_GENERATE_COUNT: document.getElementById('botGenerateCount').value,
+      ENABLE_BIDDING: document.getElementById('botEnableBidding').checked ? 'true' : 'false',
+      ENABLE_SELLING: document.getElementById('botEnableSelling').checked ? 'true' : 'false',
+      ENABLE_FINALIZE: document.getElementById('botEnableFinalize').checked ? 'true' : 'false',
+      AUTO_GENERATE_AUCTIONS: document.getElementById('botAutoGenerate').checked ? 'true' : 'false',
+    }
+  };
+  const result = await post('/api/bots', payload);
+  if (result.ok) {
+    toast('Bot saved', 'ok');
+    resetBotForm();
+    loadBots();
+  } else {
+    toast(result.error || 'Failed to save bot', 'err');
+  }
+}
+
+async function startBotProfile(id) {
+  const result = await post('/api/bots/start', { id });
+  toast(result.ok ? 'Bot started' : (result.error || 'Start failed'), result.ok ? 'ok' : 'err');
+  loadBots();
+}
+
+async function stopBotProfile(id) {
+  const result = await post('/api/bots/stop', { id });
+  toast(result.ok ? 'Bot stopped' : (result.error || 'Stop failed'), result.ok ? 'ok' : 'err');
+  loadBots();
+}
+
+async function runBotProfile(id) {
+  const result = await post('/api/bots/run-once', { id });
+  toast(result.ok ? 'Bot cycle triggered' : (result.error || 'Run failed'), result.ok ? 'ok' : 'err');
+  loadBots();
+}
+
+async function deleteBotProfile(id) {
+  if (!confirm('Delete this bot profile?')) return;
+  const result = await post('/api/bots/delete', { id });
+  toast(result.ok ? 'Bot deleted' : (result.error || 'Delete failed'), result.ok ? 'ok' : 'err');
+  loadBots();
+}
+
+async function startNetworkBots() {
+  const result = await post('/api/bots/start-network', {});
+  toast(result.ok ? 'Enabled bots started' : (result.error || 'Network start failed'), result.ok ? 'ok' : 'err');
+  loadBots();
+}
+
+async function stopNetworkBots() {
+  const result = await post('/api/bots/stop-network', {});
+  toast(result.ok ? 'All bots stopped' : (result.error || 'Network stop failed'), result.ok ? 'ok' : 'err');
+  loadBots();
+}
+
+async function runNetworkBots(scope = 'running') {
+  const result = await post('/api/bots/run-network', { scope });
+  if (result.ok) {
+    toast(`Triggered ${result.triggered} bot(s)${result.skipped ? `, skipped ${result.skipped}` : ''}`, 'ok');
+  } else {
+    toast(result.error || 'Network run failed', 'err');
+  }
+  loadBots();
+}
+
+async function loadLogs() {
+  if (!document.getElementById('panel-logs').classList.contains('active')) return;
+  const logs = await get('/api/logs');
+  document.getElementById('logs').innerHTML = logs.slice(0, 120)
+    .map((line) => `<div>[${line.time.slice(11, 19)}] ${escapeHtml(line.msg)}</div>`)
+    .join('');
+}
+
+async function showDiagnostics() {
+  const diag = await get('/api/diagnostics');
+  toast(`Factory ${diag.factoryExists ? 'ok' : 'missing'} | raw ${diag.rawAddressesCount} | loaded ${diag.validAuctions}`, diag.factoryExists ? 'ok' : 'err');
+}
+
+function showTab(name, button) {
+  document.querySelectorAll('.tab').forEach((tab) => tab.classList.remove('active'));
+  document.querySelectorAll('.panel').forEach((panel) => panel.classList.remove('active'));
+  button.classList.add('active');
+  document.getElementById(`panel-${name}`).classList.add('active');
+  if (name === 'logs') loadLogs();
+  if (name === 'auctions') loadAuctions();
+  if (name === 'bots') loadBots();
+  if (name === 'seller') loadSellingSchedule();
+  if (name === 'winner') loadWinners();
+}
+
+async function get(url) {
+  const response = await fetch(API + url);
+  return response.json();
+}
+
+async function post(url, body) {
+  const response = await fetch(API + url, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(body)
+  });
+  return response.json();
+}
+
+function formatTime(seconds) {
+  if (seconds < 60) return `${seconds}s`;
+  if (seconds < 3600) return `${Math.floor(seconds / 60)}m ${seconds % 60}s`;
+  return `${Math.floor(seconds / 3600)}h ${Math.floor((seconds % 3600) / 60)}m`;
+}
+
+function shortAddress(address) {
+  const text = String(address || '');
+  return text.length > 14 ? `${text.slice(0, 8)}...${text.slice(-6)}` : text;
+}
+
+function formatLargeInteger(value) {
+  const str = String(value ?? '');
+  if (!/^\d+$/.test(str)) return str;
+  if (str.length <= 9) return Number(str).toLocaleString();
+  const suffixes = [
+    { size: 15, label: 'q' },
+    { size: 12, label: 't' },
+    { size: 9, label: 'b' },
+  ];
+  for (const suffix of suffixes) {
+    if (str.length > suffix.size) {
+      const whole = str.slice(0, str.length - suffix.size);
+      const frac = str.slice(str.length - suffix.size, str.length - suffix.size + 2).replace(/0+$/, '');
+      return frac ? `${whole}.${frac}${suffix.label}` : `${whole}${suffix.label}`;
+    }
+  }
+  return Number(str).toLocaleString();
+}
+
+function formatAuctionDate(auction) {
+  const timestamp = Number(auction.endTimeSec) * 1000;
+  if (!timestamp) return '-';
+  const end = new Date(timestamp);
+  const start = new Date(end.getTime() - (Math.max(0, Number(auction.secondsLeft)) * 1000));
+  return `
+    <div>${end.toLocaleDateString()}</div>
+    <div class="mono">ends ${end.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</div>
+  `;
+}
+
+function formatDateTimeLocal(value) {
+  const date = new Date(value || Date.now());
+  if (Number.isNaN(date.getTime())) return '';
+  const offsetMs = date.getTimezoneOffset() * 60000;
+  return new Date(date.getTime() - offsetMs).toISOString().slice(0, 16);
+}
+
+function setValue(id, value) {
+  const el = document.getElementById(id);
+  if (el && document.activeElement !== el) el.value = value;
+}
+
+function setChecked(id, value) {
+  const el = document.getElementById(id);
+  if (el) el.checked = String(value) === 'true';
+}
+
+function selectOptionalValue(id) {
+  const el = document.getElementById(id);
+  if (!el) return undefined;
+  const value = String(el.value ?? '').trim();
+  return value ? value : undefined;
+}
+
+function isScheduleBuilderActive(prefix) {
+  const activeId = document.activeElement?.id || '';
+  return activeId.startsWith(`${prefix}Schedule`);
+}
+
+function escapeHtml(value) {
+  return String(value).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+}
+
+function escapeAttr(value) {
+  return escapeHtml(value).replace(/"/g, '&quot;');
+}
+
+let toastTimer;
+function toast(message, type) {
+  const el = document.getElementById('toast');
+  el.textContent = message;
+  el.className = `toast show ${type}`;
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => { el.className = 'toast'; }, 3000);
+}
+
+init();
+</script>
+</body>
+</html>
+
