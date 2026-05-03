@@ -107,7 +107,7 @@ async function createAuction(item) {
     let receipt;
     try {
       const txParams = await buildTxParams({ to: factory.options.address, gas: gasLimit });
-      receipt = await retryRpc(
+      const sendResult = await retryRpc(
         () => sendContractTransaction(
           factory.methods.createCampaign(...args),
           txParams,
@@ -116,11 +116,12 @@ async function createAuction(item) {
         2,
         1000
       );
+      receipt = await retryRpc(() => getWeb3().eth.getTransactionReceipt(sendResult.transactionHash), 5, 2000);
     } catch (sendErr) {
       logger.warn(`Create send failed for "${dataDescription}", retrying once after nonce resync`, { error: unwrapError(sendErr) });
       await resyncNonce();
       const retryTxParams = await buildTxParams({ to: factory.options.address, gas: gasLimit });
-      receipt = await retryRpc(
+      const retrySendResult = await retryRpc(
         () => sendContractTransaction(
           factory.methods.createCampaign(...args),
           retryTxParams,
@@ -129,6 +130,7 @@ async function createAuction(item) {
         2,
         1200
       );
+      receipt = await retryRpc(() => getWeb3().eth.getTransactionReceipt(retrySendResult.transactionHash), 5, 2000);
     }
     const newAddress = receipt.events?.AuctionCreated?.returnValues?.campaignAddress;
     return { receipt, newAddress };
